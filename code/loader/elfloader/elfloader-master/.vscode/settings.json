@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "reflect.h": "c",
+        "stdbool.h": "c",
+        "arch_jump.h": "c"
+    }
+}
