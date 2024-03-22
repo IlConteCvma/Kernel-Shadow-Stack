@@ -1,5 +1,7 @@
 {
     "files.associations": {
         "dirver-core.h": "c"
-    }
+    },
+    "makefile.makefilePath": "${workspaceFolder}/Makefile",
+    "C_Cpp.errorSquiggles": "disabled"
 }
