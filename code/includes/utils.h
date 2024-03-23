@@ -20,40 +20,8 @@ int offset_thread_info = 0;
 /* Get the pointer to the safety metadata stored on the original kernel stack                             */
 #define GET_SECURITY_METADATA(end_of_stack, sm) sm = (security_metadata *)end_of_stack[1];
 
-/**
- * get_absolute_pathname - obtains the name of the executable program of which the process is currently in
- * execution.
- *
- * @buf: Buffer where the absolute pathname is written
- *
- * @return: returns the name of the executable program of which the process is currently running in case
- * successfull;Otherwise, it returns the Error Code -enoent (no file or directory).
- */
-char *get_absolute_pathname(char *buf) {
-
-    int size;
-    struct file *exe_file;
-    struct task_struct *task;
-
-
-    task = current;
-
-    /* Control if the current thread has the valid memory management structure */
-    if(task->mm == NULL) {
-        return ERR_PTR(-ENOENT);
-    }
-
-    exe_file = task->mm->exe_file;
-
-    if(exe_file) {
-        strncpy(buf, exe_file->f_path.dentry->d_iname, strlen(exe_file->f_path.dentry->d_iname));
-        size = strlen(exe_file->f_path.dentry->d_iname);
-        buf[size] = '\0';
-    }
-
-    return buf;    
-}
+extern char *get_absolute_pathname(char *buf);
 
 //----- FILE UTILS
-
-#ifdef LOG_SYSTEM
+extern struct file *init_log(char *filename);
+extern void close_log(struct file *file);
