@@ -1,0 +1,2 @@
+#ifndef H_KSSSTRUCT
+#define H_KSSSTRUCT
