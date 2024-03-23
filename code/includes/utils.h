@@ -25,3 +25,6 @@ extern char *get_absolute_pathname(char *buf);
 //----- FILE UTILS
 extern struct file *init_log(char *filename);
 extern void close_log(struct file *file);
+
+
+#endif //UTILS_H

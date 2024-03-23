@@ -49,3 +49,11 @@
 int size_no_suc = 92 + 12;
 int size_suc    = 130 + 12;
 #endif //LOG_SYSTEM
+
+
+
+
+
+
+
+#endif //DEFINES_H

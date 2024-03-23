@@ -1,5 +1,7 @@
 #include "includes/kss_hashtable.h"
 
+
+
 /**
  * delete_ht_item - Allows you to remove the element in the hash table associated with the current process.
  */
@@ -40,4 +42,31 @@ void delete_ht_item(void) {
     } else {
         pr_err("%s: [ERRORE DELETE HASH TABLE ITEM] [%d] The element was not found in HT\n", MOD_NAME, current->pid);
     }
+}
+
+/**
+ * Check_ALENEDY_EXISTS - I check if the identification sent by the user has already been used for a
+ * Past process.
+ *
+ *
+ *
+ * @return: return the value 0 if the identification of the process can be used;otherwise,
+ * remain the value 1.
+ */
+int check_already_exists(char *program_name, int id_user) {
+    
+    int bkt;
+    int found;
+    ht_item *data;
+
+    found = 0;
+
+    hash_for_each(ht_tesi, bkt, data, ht_list_next) {
+        if(!strcmp(data->lsi->program_name, program_name) && ((data->lsi)->id_user == id_user)) {
+            found = 1;
+            break;
+         }
+    }
+    
+    return found;
 }

@@ -42,3 +42,6 @@ typedef struct ht_item {
 //Functions
 
 extern void delete_ht_item(void);
+extern int check_already_exists(char *program_name, int id_user);
+
+#endif //HASHTAB_H

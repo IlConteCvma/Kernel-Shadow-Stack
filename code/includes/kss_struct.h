@@ -80,5 +80,8 @@ typedef struct security_metadata {
 
 
 
+// Functions
 
 
+
+#endif //KSSSTRUCT_H

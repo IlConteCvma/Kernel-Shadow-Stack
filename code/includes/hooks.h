@@ -7,3 +7,8 @@
 #define finish_task_switch_func      "finish_task_switch.isra.0"
 #define finish_task_switch_cold_func "finish_task_switch.isra.0.cold"
 #define kernel_clone_func            "kernel_clone"
+
+
+
+
+#endif

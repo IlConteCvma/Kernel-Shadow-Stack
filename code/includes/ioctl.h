@@ -50,4 +50,7 @@ typedef struct log_system_info {
 #define SECURITY_METADATA _IO('b', 'b')
 #endif //LOG_SYSTEM
 
-#endif
+
+
+
+#endif //INSTRUM_MAP_H
