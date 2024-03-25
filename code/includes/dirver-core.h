@@ -19,10 +19,7 @@
 #include <linux/delay.h>
 
 
-#include "includes/module-defines.h"
-#include "includes/utils.h"
-#include "includes/kss_struct.h"
-#include "includes/workqueue.h"
+
 
 
 // Global variables

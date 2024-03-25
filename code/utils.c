@@ -77,3 +77,202 @@ struct file *init_log(char *filename) {
 void close_log(struct file *file) {
     filp_close(file, NULL);
 }
+
+/**
+ * Kill_Process - The execution of the entire process ends.
+ *
+ * This function can be invoked when an abnormal system behavior occurs.
+ * When a process of the process generates an event of 'corrupt user stack' then the whole process can
+ * be finished.
+ */
+void kill_process(void) {
+    pr_info("%s: [KILL PROCESS] [%d] Termination of the entire process in progress...\n", MOD_NAME, current->pid);
+    do_group_exit_addr((1 & 0xFF)<<8);
+}
+
+
+/**
+ * is_FF_call - Check if the machine education is a call with 0xff operating code.
+ *
+ * @istr_addr: Machine education address
+ *
+ * @return: return the value 1 if there is a 0xff call;otherwise, returns
+ * The value 0.
+ */
+int is_FF_call(unsigned char *instr_addr) {
+
+    int i;
+    int found;
+    unsigned char byte;
+
+
+    /* I start with the idea of not having found any CALL 0xFF    */
+    found = 0;
+
+    /*
+     * Research the first 0xff byte starting from 7 bytes before.I observe they exist
+     * of bytes who are not candidates to represent the beginning of an instruction
+     * of Call.More precisely, there are no call instructions codified with a
+     * Single byte or with five bytes.After the 0xff opcode, a
+     * further bytes that extends the operating code.To increase safety
+     * occurs if the REG field of this byte (the 3 central bits) assume the
+     * value 2 or 3.
+     */
+
+    for(i = 0; i < 7; i++) {
+    
+        /* I do not consider the positions in which there can be no start of a call */
+        if(i == 2 || i == 6) continue;
+
+        if(instr_addr[i] == 0xFF) {
+        
+            /* I check the next byte that extends the opcode                */
+
+            /*Recovery the byte following the possible start of the call        */
+            byte = instr_addr[i+1];
+
+            /* Recovery the contents of the REG camp                          */
+            byte = byte & IS_FF_REG;
+
+            if((byte >> 3) == 2 || (byte >> 3) == 3) {
+                found = 1;
+                break;
+            }            
+            
+        }
+    }
+
+    return found;
+}
+
+/**
+ * is_E8_call - Check if the machine education is a call with 0xe8 operating code.
+ *
+ * @istr_addr: Machine education address
+ *
+ * @return: return the value 1 if there is a valid 0x8 call;otherwise, returns
+ * The value 0.
+ */
+int is_E8_call(unsigned char *instr_addr) {
+
+    if(instr_addr[2] == 0xE8)   return 1;
+
+    return 0;
+}
+
+/**
+ * check_call_security - Check if the machine instruction prior to that at the address of
+ * Memory @ret_addr_user is a call.There are different types of calls but the maximum number
+ * of bytes that can be used for coding a call instruction is equal to 7
+ * (excluding the prefix bytes).
+ *
+ * @ret_addr_user: return address from which you would like to resume user execution
+ *
+ * @return: returns the value 0 if the previous education is a call;returns the value
+ * 1 If the previous instruction is not a call;otherwise, returns in case of error the
+ * value -1.
+ */
+static int check_call_security(unsigned char *ret_addr_user) {
+    
+    int ret;
+    unsigned char byte[7];
+
+    /* Recovery the maximum number of bytes with which you can codify a call */
+    ret = copy_from_user(byte, ret_addr_user - 7, 7);
+
+    /* I check if an error has occurred in reading byte */
+    if(ret) {
+        pr_err("%s: [ERROR INVALID OPCODE CHECK CALL] [%d] Error in the recovery of the previous machine education in the user space [byte Unread --> %d]\n",
+        MOD_NAME,
+        current->pid,
+        ret);
+        return -1;
+    }
+
+    /* I check if the previous machine instruction is a type of call */
+    if(is_E8_call(byte) || is_FF_call(byte))    return 0;
+
+    return 1;
+}
+
+#ifdef IOCTL_INSTRUM_MAP
+/**
+ * check_0x06 - Check if the 0x06 byte present at the memory address @ret_instr_addr was
+ * Posted by the Loader Elf.The bytes inserted by the Loader Elf are recorded in the instrument map.
+ *
+ * @ret_instr_addr: memory address of the byte 0x06
+ * @SM: Poller to the safety metadata of the current thread
+ *
+ * @return: returns the value 1 if the 0x06 byte has been inserted by the Loader Elf;otherwise,
+ * Returns the value 0.
+ */
+int check_0x06(unsigned long ret_instr_addr, security_metadata *sm) {
+
+    int i;
+    int ret_num;
+    unsigned long *map_0x06;
+    struct ioctl_data *map;
+
+
+    /* I perform minimal correctness controls on the data structure */
+    if(sm == NULL || sm->magic_number != (unsigned long)MAGIC_NUMBER) {
+        pr_err("%s: [INVALID OPCODE HOOK][ERRORE CHECK 0x06][%d] The safety metadata were not stored on the original Stack Kernel\n",
+        MOD_NAME,
+        current->pid);
+        return 0;
+    }
+
+    /* Recovery the pointer to the instrument map              */
+    map = sm->instrum_map;
+
+    if(map == NULL) {
+        return 1;
+    }
+
+    /*Recovery the Map of Instrumentation for the 0x06 bytes */
+    map_0x06 = map->ret_array;
+
+    /* Recovery of the size of the instrument map for byte 0x06 */
+    ret_num = map->ret_num;
+
+    /*
+     * Se map_0x06 == NULL è vera allora significa che il Loader ELF non ha instrumentato alcuna
+     * istruzione di RET. Di conseguenza, non è possibile che sia giunta al Kernel una richiesta di
+     * simulazione di RET.
+     */
+
+
+    if((void *)map_0x06 == NULL && ret_num == 0) {
+        pr_err("%s: [ERRORE CHECK 0x06] The map does not exist.In the Address Space there is a 0x06 byte that has not been inserted by the Loader Elf\n", MOD_NAME);
+        return 0;
+    } else if((void *)map_0x06 == NULL && ret_num != 0) {
+        pr_err("%s: [ERRORE CHECK 0x06] The 0x06 byte map is not present in memory but there are Rets instructed by the Loader Elf\n", MOD_NAME);
+        return 0;
+    } else if((void *)map_0x06 != NULL && ret_num == 0) {
+        pr_err("%s: [ERRORE CHECK 0x06] The 0x06 byte map is present in memory but there are no RETs instructed by the Loader Elf\n", MOD_NAME);
+        return 0;
+    }
+
+    for(i=0; i<ret_num; i++) {
+
+        if(map_0x06[i] == ret_instr_addr) {
+#ifdef DEBUG_IOCTL_FUNC
+            pr_info("%s: [CHECK 0x06] The 0x06 byte by address %px It was added by the Loader Elf\n",
+            MOD_NAME,
+            (void *)ret_instr_addr);
+#endif
+            return 1;
+        }
+    }
+
+#ifdef DEBUG_IOCTL_FUNC
+    pr_info("%s: [ERRORE CHECK 0x06]The 0x06 byte by address %px It was not added by the Loader Elf\n",
+    MOD_NAME,
+    (void *)ret_instr_addr);
+#endif
+
+    return 0;
+}
+#endif
+
+

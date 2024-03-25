@@ -85,6 +85,27 @@ typedef struct security_metadata {
 extern int check_integrity_security_metadata(unsigned long *end_of_stack);
 extern int check_errore_finish_task_switch_hook(unsigned long *end_of_stack);
 extern int check_error_security_metadata(unsigned long *end_of_stack);
+extern stack_item *get_free_item(unsigned long *end_of_stack);
+extern void insert_free_item(stack_item *item, security_metadata *sm);
+extern void del_item_stack(stack_item *item, security_metadata *sm);
+
+#ifdef LOG_SYSTEM
+extern int single_address_one_copy(stack_item* top_stack, unsigned long user_stack_address, unsigned long *return_address, security_metadata *sm, unsigned long regs_ip);
+extern int block_address(stack_item* top_stack, unsigned long user_stack_address, unsigned long *return_address, security_metadata *sm, unsigned long regs_ip);
+extern int single_address(stack_item* top_stack, unsigned long user_stack_address, unsigned long *return_address, security_metadata *sm, unsigned long regs_ip);
+extern int iter_block_address(stack_item* top_stack, unsigned long user_stack_address, unsigned long *return_address, security_metadata *sm, unsigned long regs_ip);
+extern int check_all_return_adress(stack_item* top_stack, unsigned long user_stack_address, unsigned long *return_address, security_metadata *sm, unsigned long regs_ip);
+
+
+#else
+extern int single_address_one_copy(stack_item* top_stack, unsigned long user_stack_address, unsigned long *return_address, security_metadata *sm);
+extern block_address(stack_item* top_stack, unsigned long user_stack_address, unsigned long *return_address, security_metadata *sm)
+extern int single_address(stack_item* top_stack, unsigned long user_stack_address, unsigned long *return_address, security_metadata *sm);
+extern int iter_block_address(stack_item* top_stack, unsigned long user_stack_address, unsigned long *return_address, security_metadata *sm);
+extern int check_all_return_adress(stack_item* top_stack, unsigned long user_stack_address, unsigned long *return_address, security_metadata *sm);
+
+
+#endif
 
 
 #endif //KSSSTRUCT_H

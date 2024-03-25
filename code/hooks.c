@@ -469,3 +469,37 @@ static int handler_kernel_clone(struct kprobe *p, struct pt_regs *regs) {
     } 
     return 0;
 }
+
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0)
+/**
+ * get_kallsyms_lookup_name - Recovers the memory address of the Kallsyms_lookup_name () function.
+ * This function is invoked if Kallsyms_lookup_Name () is not exported to the current version
+ * of the kernel.
+ *
+ * @return: the memory address of the kallsyms_lookup_name () function in case of success;
+ * Otherwise, it returns the Null value.
+ */
+static kallsyms_lookup_name_t get_kallsyms_lookup_name(void) {
+
+    int ret;
+    kallsyms_lookup_name_t kallsyms_lookup_name;
+
+    ret = register_kprobe(&kp_kallsyms_lookup_name);
+
+    if(ret < 0) {
+        pr_err("%s [ERROR KALLSYMS_LOOKUP_NAME] [%d] It is not possible to find the address of the functionkallsyms_lookup_name()\n",
+        MOD_NAME,
+        current->pid);
+        return NULL;
+    }
+
+    /* Recovery of the address of the Kallsyms_lookup_name () function */
+    kallsyms_lookup_name = (kallsyms_lookup_name_t) kp_kallsyms_lookup_name.addr;
+
+    unregister_kprobe(&kp_kallsyms_lookup_name);
+
+    return kallsyms_lookup_name;
+}
+#endif
+

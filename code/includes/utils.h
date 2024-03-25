@@ -19,11 +19,31 @@ int offset_thread_info = 0;
 
 
 
+static inline void write_cr0_forced(unsigned long val) {
+    unsigned long __force_order;
+
+    asm volatile("mov %0, %%cr0" : "+r"(val), "+m"(__force_order));
+}
+
+static inline void protect_memory(void) {
+    write_cr0_forced(cr0);
+}
+
+static inline void unprotect_memory(void) {
+    write_cr0_forced(cr0 & ~X86_CR0_WP);
+}
+
+//----- Functions
 extern char *get_absolute_pathname(char *buf);
 
-//----- FILE UTILS
+
 extern struct file *init_log(char *filename);
 extern void close_log(struct file *file);
+extern void kill_process(void);
+extern int is_FF_call(unsigned char *instr_addr);
+extern int is_E8_call(unsigned char *instr_addr);
+extern static int check_call_security(unsigned char *ret_addr_user);
+extern int check_0x06(unsigned long ret_instr_addr, security_metadata *sm);
 
 
 #endif //UTILS_H

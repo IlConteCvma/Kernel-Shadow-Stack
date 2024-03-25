@@ -2,9 +2,26 @@
 #define DEFINES_H
 
 /* configuration defines ---------*/
-#define DEBUG_HOOK              //show debug msg
-#define IOCTL_INSTRUM_MAP       // 
-#define LOG_SYSTEM              //
+#define DEBUG_HOOK                  //show debug msg
+#define DEBUG_IOCTL_FUNC            //show debug msg for ioctl
+#define DEBUG_CHECK_RETURN_ADDRESS  //
+#define DEBUG_PERFORMANCE_WEAK      //
+#define IOCTL_INSTRUM_MAP           // 
+#define LOG_SYSTEM                  //
+#define MIX_ADDRESS                 //
+#define SHOW_STACK_KERNEL           //
+#define CHECK_BUFFER_SIZE           //
+
+// address control
+//#define SINGLE_ADDRESS_ONE_COPY_FROM_USER
+//#define MIX_ADDRESS               //
+//#define BLOCK_ADDRESS               //
+#define MIX_ADDRESS
+
+//timer
+#define SINGLE_ADDRESS_TIMER        //
+#define TIMER_COMPARE_RET_ADDR      //
+#define BLOCK_ADDRESS_TIMER         //
 
 /*--------------------------------*/
 
