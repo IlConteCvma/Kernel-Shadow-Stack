@@ -1,4 +1,5 @@
 #include "includes/utils.h"
+#include "includes/module-defines.h"
 
 /**
  * get_absolute_pathname - obtains the name of the executable program of which the process is currently in
@@ -269,6 +270,77 @@ int check_0x06(unsigned long ret_instr_addr, security_metadata *sm) {
     pr_info("%s: [ERRORE CHECK 0x06]The 0x06 byte by address %px It was not added by the Loader Elf\n",
     MOD_NAME,
     (void *)ret_instr_addr);
+#endif
+
+    return 0;
+}
+
+/**
+ * Check_int_0xff - Check if the INSTRUCTION INT 0XFF present at the memory address @call_instr_addr is
+ * has been inserted by the Loader Elf.
+ *
+ * @call_instr_addr: Memory address of the Int 0xff instruction
+ * @sm: Safety metadata pointer
+ *
+ * @return: returns the value 1 if the address of the Education of Int 0xff is valid;otherwise,
+ * Returns the value 0.
+ */
+int check_int_0xFF(unsigned long call_instr_addr, security_metadata *sm) {
+
+    int i;
+    int call_num;
+    unsigned long *map_int_0xFF;
+    struct ioctl_data *map;
+
+
+    /* We perform consistency checks on safety metadata to be used*/
+    if(sm == NULL || sm->magic_number != (unsigned long)MAGIC_NUMBER) {
+        pr_err("%s: [ERROR CHECK INT 0xFF][%d] The safety metadata were not stored on the original kernel stack \n",
+        MOD_NAME,
+        current->pid);
+        return 0;
+    }
+
+    /* Recovery of the trend in the process associated with the process to which the current thread belongs*/
+    map = sm->instrum_map;
+
+    if(map == NULL) {
+        return 1;
+    }
+
+    /* Recovery of the instrument map for INSTRUCTIONS INT 0XFF*/
+    map_int_0xFF = map->call_array;
+
+    /* Recovery of the size of the instrument to instructions for instructions INT 0xFF */
+    call_num = map->call_num;
+
+    if((void *)map_int_0xFF == NULL && call_num == 0) {
+        pr_err("%s: [ERROR CHECK INT 0xFF] The map does not exist.In the Address Space there is one INT 0xFF which was not inserted by the Loader Elf\n", MOD_NAME);
+        return 0;
+    } else if((void *)map_int_0xFF == NULL && call_num != 0) {
+        pr_err("%s: [ERROR CHECK INT 0xFF] The Int 0xff map is not present in memory but there are institled calls from the Loader Elf\n", MOD_NAME);
+        return 0;
+    } else if((void *)map_int_0xFF != NULL && call_num == 0) {
+        pr_err("%s: [ERROR CHECK INT 0xFF] The Int 0xff map is present in memory but there are no instance calls by the Loader Elf\n", MOD_NAME);
+        return 0;
+    }
+
+    /* Itero on the addresses of the Instructions Int 0xff that are present in the instrument map */
+    for(i=0; i<call_num; i++) {
+        if(map_int_0xFF[i] == call_instr_addr) {
+#ifdef DEBUG_IOCTL_FUNC
+            pr_info("%s: [CHECK INT 0xFF] Instruction Int 0xff at address %px It was added by the Loader Elf\n",
+            MOD_NAME,
+            (void *)call_instr_addr);
+#endif
+            return 1;
+        }
+    }
+
+#ifdef DEBUG_IOCTL_FUNC
+    pr_info("%s: [ERRORE CHECK INT 0xFF] Instruction Int 0xff at address %px It was not added by the Loader Elf\n",
+    MOD_NAME,
+    (void *)call_instr_addr);
 #endif
 
     return 0;

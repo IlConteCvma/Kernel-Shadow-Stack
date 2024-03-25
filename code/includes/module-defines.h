@@ -6,11 +6,16 @@
 #define DEBUG_IOCTL_FUNC            //show debug msg for ioctl
 #define DEBUG_CHECK_RETURN_ADDRESS  //
 #define DEBUG_PERFORMANCE_WEAK      //
+#define DEBUG_INVALID_OP            //
+#define DEBUG_SPURIOUS              //
 #define IOCTL_INSTRUM_MAP           // 
 #define LOG_SYSTEM                  //
 #define MIX_ADDRESS                 //
 #define SHOW_STACK_KERNEL           //
 #define CHECK_BUFFER_SIZE           //
+
+#define KILL_PROCESS_NO_CALL        //kill process if no call event
+
 
 // address control
 //#define SINGLE_ADDRESS_ONE_COPY_FROM_USER

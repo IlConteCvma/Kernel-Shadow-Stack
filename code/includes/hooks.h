@@ -15,6 +15,8 @@ extern static int handler_finish_task_switch(struct kprobe *pk, struct pt_regs *
 extern static int hook_do_exit(struct kprobe *p, struct pt_regs *regs);
 extern static int handler_kernel_clone(struct kprobe *p, struct pt_regs *regs);
 extern static kallsyms_lookup_name_t get_kallsyms_lookup_name(void);
+extern void my_invalid_op_handler(struct pt_regs *regs);
+extern void my_spurious_handler(struct pt_regs *regs);
 
 static struct kprobe kp_kernel_clone = {
     .symbol_name = kernel_clone_func,

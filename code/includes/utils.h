@@ -44,6 +44,7 @@ extern int is_FF_call(unsigned char *instr_addr);
 extern int is_E8_call(unsigned char *instr_addr);
 extern static int check_call_security(unsigned char *ret_addr_user);
 extern int check_0x06(unsigned long ret_instr_addr, security_metadata *sm);
+extern int check_int_0xFF(unsigned long call_instr_addr, security_metadata *sm) ;
 
 
 #endif //UTILS_H
