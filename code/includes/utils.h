@@ -17,8 +17,7 @@ int offset_thread_info = 0;
 /* Get the base of the original current thread stack kernel                                                    */
 #define GET_KERNEL_STACK_BASE(p) p = (unsigned long *)((void*)current->stack + offset_thread_info);
 
-/* Get the pointer to the safety metadata stored on the original kernel stack                             */
-#define GET_SECURITY_METADATA(end_of_stack, sm) sm = (security_metadata *)end_of_stack[1];
+
 
 extern char *get_absolute_pathname(char *buf);
 

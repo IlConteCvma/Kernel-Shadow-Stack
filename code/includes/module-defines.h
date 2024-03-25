@@ -1,6 +1,13 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
+/* configuration defines ---------*/
+#define DEBUG_HOOK              //show debug msg
+#define IOCTL_INSTRUM_MAP       // 
+#define LOG_SYSTEM              //
+
+/*--------------------------------*/
+
 
 /* Name of the kernel module                                                                                              */
 #define MOD_NAME "KSS"

@@ -78,10 +78,13 @@ typedef struct security_metadata {
 
 
 
-
+/* Get the pointer to the safety metadata stored on the original kernel stack                             */
+#define GET_SECURITY_METADATA(end_of_stack, sm) sm = (security_metadata *)end_of_stack[1];
 
 // Functions
-
+extern int check_integrity_security_metadata(unsigned long *end_of_stack);
+extern int check_errore_finish_task_switch_hook(unsigned long *end_of_stack);
+extern int check_error_security_metadata(unsigned long *end_of_stack);
 
 
 #endif //KSSSTRUCT_H
