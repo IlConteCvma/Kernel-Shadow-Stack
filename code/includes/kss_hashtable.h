@@ -1,6 +1,8 @@
 #ifndef HASHTAB_H
 #define HASHTAB_H
 #include <linux/hashtable.h>
+#include "my_ioctl.h"
+#include "module-defines.h"
 
 #if defined(IOCTL_INSTRUM_MAP) || defined(LOG_SYSTEM)
 

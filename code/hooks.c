@@ -4,6 +4,8 @@
 #include "includes/kss_hashtable.h"
 #include "includes/logging.h"
 #include "includes/kss_struct.h"
+#include "includes/dirver-core.h"
+
 
 /**
  * Handler_finish_task_Switch - allows you to allocate the data structures per -keep if the current thread
@@ -11,7 +13,7 @@
  * Context_Switch ().If the thread is part of our architecture and the safety metadata have not been
  * still allocated then its allocation is performed.
  */
-static int handler_finish_task_switch(struct kprobe *pk, struct pt_regs *regs) {
+int handler_finish_task_switch(struct kprobe *pk, struct pt_regs *regs) {
 
     int i;
     char *absolute_path;
@@ -244,7 +246,7 @@ static int handler_finish_task_switch(struct kprobe *pk, struct pt_regs *regs) {
  * Use our security architecture and any information shared among the threads
  * that belong to the same process.
  */
-static int hook_do_exit(struct kprobe *p, struct pt_regs *regs) {
+int hook_do_exit(struct kprobe *p, struct pt_regs *regs) {
 
     unsigned long *end_of_stack;
     security_metadata *sm;
@@ -430,7 +432,7 @@ next_step_exit:
  * Another then you have to report the presence of a further thread for information
  * Shared.
  */
-static int handler_kernel_clone(struct kprobe *p, struct pt_regs *regs) {
+int handler_kernel_clone(struct kprobe *p, struct pt_regs *regs) {
 
     char *absolute_path;
     char buf[MAX_PATH_EXEC] = {0};
@@ -481,7 +483,7 @@ static int handler_kernel_clone(struct kprobe *p, struct pt_regs *regs) {
  * @return: the memory address of the kallsyms_lookup_name () function in case of success;
  * Otherwise, it returns the Null value.
  */
-static kallsyms_lookup_name_t get_kallsyms_lookup_name(void) {
+kallsyms_lookup_name_t get_kallsyms_lookup_name(void) {
 
     int ret;
     kallsyms_lookup_name_t kallsyms_lookup_name;

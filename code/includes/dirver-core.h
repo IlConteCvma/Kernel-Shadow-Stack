@@ -19,14 +19,16 @@
 #include <linux/delay.h>
 
 
-
+typedef void (*exc_invalid_op_t) (struct pt_regs *regs);
+typedef void (*sysvec_spurious_apic_interrupt_t) (struct pt_regs *regs);
 
 
 // Global variables
 
 /* Takes into account the number of threads that are inside the architecture and which are still running              */
-int num_threads = 0;
-
+extern int num_threads;
+extern exc_invalid_op_t exc_invalid_op; 
+extern sysvec_spurious_apic_interrupt_t sysvec_spurious_apic_interrupt; 
 /*
  * The 'Absolute_path_elf_loader' variable contains the name of the executable of our Elf Loader.This information is
  * At the basis of the process identification mechanism.To understand if the events have been generated
@@ -35,7 +37,7 @@ int num_threads = 0;
  * perform the logic of security architecture and not the logic of the default management of the events present in
  * Kernel Linux.
  */
-const char *absolute_path_elf_loader = "reflect";
+#define absolute_path_elf_loader  "reflect"
 
 
 

@@ -1,6 +1,28 @@
 #include "includes/module-defines.h"
 #include "includes/kss_struct.h"
+#include "includes/utils.h"
 #include "includes/logging.h"
+#include "includes/dirver-core.h"
+
+
+#ifdef SINGLE_ADDRESS_TIMER
+unsigned long average_time_one_byte = 0;
+unsigned long total_time_one_byte = 0;
+unsigned long counter_one_byte = 0;
+#endif //SINGLE_ADDRESS_TIMER
+
+#ifdef BLOCK_ADDRESS_TIMER
+unsigned long average_time_block = 0;
+unsigned long total_time_block = 0;
+unsigned long counter_block = 0;
+#endif //BLOCK_ADDRESS_TIMER
+
+#ifdef TIMER_COMPARE_RET_ADDR
+unsigned long average_time_compare = 0;
+unsigned long total_time_compare = 0;
+unsigned long counter_compare = 0;
+int guard = 0;
+#endif
 
 /**
 * Check_integrity_Security_Medata - verifies the integrity of the safety metadata and the Kernel level stack
@@ -35,7 +57,7 @@ int check_integrity_security_metadata(unsigned long *end_of_stack) {
  *
  * @return: return the value 1 if the error has occurred;Otherwise it returns the value 0.
  */
-int check_errore_finish_task_switch_hook(unsigned long *end_of_stack) {
+int check_error_finish_task_switch_hook(unsigned long *end_of_stack) {
 
     security_metadata *sm;
 

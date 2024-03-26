@@ -1,6 +1,9 @@
 #ifndef HOOKS_H
 #define HOOKS_H
 
+#include "dirver-core.h"
+
+
 /* Names of the kernel functions on which to install the Hooks                                                               */
 #define do_exit_func                 "do_exit"
 #define kallsyms_lookup_name_func    "kallsyms_lookup_name"
@@ -9,23 +12,21 @@
 #define kernel_clone_func            "kernel_clone"
 
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0)
 
-//Functions 
-extern static int handler_finish_task_switch(struct kprobe *pk, struct pt_regs *regs);
-extern static int hook_do_exit(struct kprobe *p, struct pt_regs *regs);
-extern static int handler_kernel_clone(struct kprobe *p, struct pt_regs *regs);
-extern static kallsyms_lookup_name_t get_kallsyms_lookup_name(void);
-extern void my_invalid_op_handler(struct pt_regs *regs);
-extern void my_spurious_handler(struct pt_regs *regs);
-extern int patch_IDT(unsigned long address_first_handler, unsigned long address_expected_C_handler, 
-        struct desc_ptr dtr, int vector_number, void *handler, struct info_patch *item);
-
-extern int install_kprobes(void);
-
-static struct kprobe kp_kernel_clone = {
-    .symbol_name = kernel_clone_func,
-    .pre_handler = handler_kernel_clone
+/*
+ * Kernel Probe to obtain the address of the Kallsyms_lookup_Name () function.
+ * This function allows you to recover the addresses of events managers
+ * of interest in order to check if the current version of the kernel can
+ * be used.
+ */
+static struct kprobe kp_kallsyms_lookup_name = {
+    .symbol_name = kallsyms_lookup_name_func
 };
+
+/* I define the signature for the Kallsyms_lookup_name function                  */
+typedef unsigned long (*kallsyms_lookup_name_t)(const char *name);
+#endif
 
 /**
  * @old_call_operand: operating the call to restore the disassembly of the form
@@ -41,6 +42,34 @@ struct info_patch {
     gate_desc old_entry;
     gate_desc my_trap_desc;
 };
+
+
+
+
+
+
+
+
+
+
+//Functions 
+extern int handler_finish_task_switch(struct kprobe *pk, struct pt_regs *regs);
+extern int hook_do_exit(struct kprobe *p, struct pt_regs *regs);
+extern int handler_kernel_clone(struct kprobe *p, struct pt_regs *regs);
+extern kallsyms_lookup_name_t get_kallsyms_lookup_name(void);
+extern void my_invalid_op_handler(struct pt_regs *regs);
+extern void my_spurious_handler(struct pt_regs *regs);
+extern int patch_IDT(unsigned long address_first_handler, unsigned long address_expected_C_handler, 
+        struct desc_ptr dtr, int vector_number, void *handler, struct info_patch *item);
+
+extern int install_kprobes(void);
+
+static struct kprobe kp_kernel_clone = {
+    .symbol_name = kernel_clone_func,
+    .pre_handler = handler_kernel_clone
+};
+
+
 
 /*
  * Kernel Probe to intercept the allocation of safety metadata.When
@@ -66,33 +95,9 @@ static struct kprobe kp_do_exit = {
     .pre_handler = hook_do_exit
 };
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0)
 
-/*
- * Kernel Probe to obtain the address of the Kallsyms_lookup_Name () function.
- * This function allows you to recover the addresses of events managers
- * of interest in order to check if the current version of the kernel can
- * be used.
- */
-static struct kprobe kp_kallsyms_lookup_name = {
-    .symbol_name = kallsyms_lookup_name_func
-};
 
-/* I define the signature for the Kallsyms_lookup_name function                  */
-typedef unsigned long (*kallsyms_lookup_name_t)(const char *name);
-#endif
 
-/* Definisco la segnatura del gestore C di alto livello per l'Invalid Opcode    */
-typedef void (*exc_invalid_op_t) (struct pt_regs *regs);
-
-/* Definisco la segnatura del gestore C di alto livello per l'interrupt spuria  */
-typedef void (*sysvec_spurious_apic_interrupt_t) (struct pt_regs *regs);
-
-/* definisco la segnatura per la funzione do_group_exit()                       */
-typedef void (*do_group_exit_t)(int code);
-
-/* L'indirizzo della funzione do_group_exit()                                   */
-do_group_exit_t do_group_exit_addr;
 
 
 #endif

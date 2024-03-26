@@ -524,7 +524,10 @@ int write_call_event_to_log_buffer(unsigned long target_func_addr, unsigned long
  *
  * @return: returns the value -1 in case of error;Otherwise, it returns the value 0.
  */
-int write_no_call_event_to_log_buffer(unsigned long ret_instr_addr, unsigned long return_address, security_metadata *sm) {
+
+int write_no_call_event_to_log_buffer(unsigned long ret_instr_addr, 
+                            unsigned long return_address, security_metadata *sm) 
+{
 
     int ret;
     size_t size;
@@ -588,4 +591,3 @@ int write_no_call_event_to_log_buffer(unsigned long ret_instr_addr, unsigned lon
 
     return 0;
 }
-

@@ -3,6 +3,8 @@
 #define UTILS_H
 
 #include <linux/fs.h>
+#include "kss_struct.h"
+#include "module-defines.h"
 
 /* Allows you to reconstruct the address of the ASM manager stored in the entry of the IDT table                        */
 #define HML_TO_ADDR(h,m,l)      ((unsigned long) (l) | ((unsigned long) (m) << 16) | ((unsigned long) (h) << 32))
@@ -17,6 +19,7 @@ int offset_thread_info = 0;
 /* Get the base of the original current thread stack kernel                                                    */
 #define GET_KERNEL_STACK_BASE(p) p = (unsigned long *)((void*)current->stack + offset_thread_info);
 
+extern unsigned long cr0;
 
 
 static inline void write_cr0_forced(unsigned long val) {
@@ -42,12 +45,12 @@ extern void close_log(struct file *file);
 extern void kill_process(void);
 extern int is_FF_call(unsigned char *instr_addr);
 extern int is_E8_call(unsigned char *instr_addr);
-extern static int check_call_security(unsigned char *ret_addr_user);
+extern int check_call_security(unsigned char *ret_addr_user);
 extern int check_0x06(unsigned long ret_instr_addr, security_metadata *sm);
 extern int check_int_0xFF(unsigned long call_instr_addr, security_metadata *sm) ;
-extern static unsigned long get_full_offset_by_vector(gate_desc *idt, int vector_number);
-extern static unsigned long get_full_offset_spurious_interrput(gate_desc *idt);
-extern static unsigned long get_full_offset_invalid_opcode(gate_desc *idt);
+extern unsigned long get_full_offset_by_vector(gate_desc *idt, int vector_number);
+extern unsigned long get_full_offset_spurious_interrput(gate_desc *idt);
+extern unsigned long get_full_offset_invalid_opcode(gate_desc *idt);
 
 
 #endif //UTILS_H

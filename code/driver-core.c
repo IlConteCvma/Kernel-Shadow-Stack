@@ -2,8 +2,8 @@
 #include "includes/module-defines.h"
 #include "includes/utils.h"
 #include "includes/kss_struct.h"
-#include "includes/workqueue.h"
 #include "includes/hooks.h"
+#include "includes/my_ioctl.h"
 #include "includes/kss_hashtable.h"
 #include "includes/logging.h"
 
@@ -13,39 +13,22 @@ MODULE_DESCRIPTION("Kernel shadow stack module");
 MODULE_VERSION("1.0");
 
 //functions
-int module_init(void);
+int kss_module_init(void);
 static long my_ioctl(struct file *file, unsigned int cmd, unsigned long arg);
-void module_exit(void);
+void kss_module_exit(void);
 
+int num_threads = 0;
 
-
-sysvec_spurious_apic_interrupt_t sysvec_spurious_apic_interrupt;    /* Polctor to the Co -High level C manager for the management of the disasters of the spuries interrupt  */
+sysvec_spurious_apic_interrupt_t sysvec_spurious_apic_interrupt;    /* Pointer to the Co -High level C manager for the management of the disasters of the spuries interrupt  */
 exc_invalid_op_t exc_invalid_op;                                    /* Top leader C manager of high level of default for the management of the INVALID OPCODE       */
 
 static struct info_patch info_patch_spurious;                       /* Data structure maintaining information for the entry spuria binary patching          */
 static struct info_patch info_patch_invalid_op;                     /* Data structure maintaining information for the Binary Patching of Entry Invalid Opcode  */
 
-unsigned long cr0;
+
 static struct proc_dir_entry *my_proc_dir_entry;
 
-#ifdef SINGLE_ADDRESS_TIMER
-unsigned long average_time_one_byte = 0;
-unsigned long total_time_one_byte = 0;
-unsigned long counter_one_byte = 0;
-#endif //SINGLE_ADDRESS_TIMER
 
-#ifdef BLOCK_ADDRESS_TIMER
-unsigned long average_time_block = 0;
-unsigned long total_time_block = 0;
-unsigned long counter_block = 0;
-#endif //BLOCK_ADDRESS_TIMER
-
-#ifdef TIMER_COMPARE_RET_ADDR
-unsigned long average_time_compare = 0;
-unsigned long total_time_compare = 0;
-unsigned long counter_compare = 0;
-int guard = 0;
-#endif
 
 static long my_ioctl(struct file *file, unsigned int cmd, unsigned long arg) {
 
@@ -94,7 +77,7 @@ static long my_ioctl(struct file *file, unsigned int cmd, unsigned long arg) {
             GET_SECURITY_METADATA(end_of_stack, sm);
 
             /* Control any errors in the execution of finish_task_switch() hook                        */
-            if(check_errore_finish_task_switch_hook(end_of_stack)) {
+            if(check_error_finish_task_switch_hook(end_of_stack)) {
                 pr_err("%s: [ERRORE IOCTL] [%d] An error occurred during the execution of the hook finish_task_switch()\n", MOD_NAME, current->pid);
                 return -ENOMEM;
             }
@@ -749,7 +732,7 @@ struct proc_ops proc_fops = {
 
 
 
-int module_init(void) {
+int kss_module_init(void) {
 
     int ret;
     gate_desc *idt;                                                                                         /* Pointer to the IDT table                    */
@@ -993,7 +976,7 @@ return -1;
 }
 
 
-void module_exit(void) {
+void kss_module_exit(void) {
 
 	struct desc_ptr idtr;
 
@@ -1074,5 +1057,5 @@ redo_exit:
     current->pid);
 }
 
-module_init(module_init);
-module_exit(module_exit);
+module_init(kss_module_init);
+module_exit(kss_module_exit);

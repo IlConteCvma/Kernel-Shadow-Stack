@@ -1,6 +1,14 @@
 #include "includes/utils.h"
 #include "includes/module-defines.h"
 
+
+#include <linux/kprobes.h>
+#include <asm/trapnr.h>
+
+
+//Global var
+unsigned long cr0;
+
 /**
  * get_absolute_pathname - obtains the name of the executable program of which the process is currently in
  * execution.
@@ -173,7 +181,7 @@ int is_E8_call(unsigned char *instr_addr) {
  * 1 If the previous instruction is not a call;otherwise, returns in case of error the
  * value -1.
  */
-static int check_call_security(unsigned char *ret_addr_user) {
+int check_call_security(unsigned char *ret_addr_user) {
     
     int ret;
     unsigned char byte[7];
@@ -358,7 +366,7 @@ int check_int_0xFF(unsigned long call_instr_addr, security_metadata *sm) {
  * @return: returns the memory address of the Asm manager corresponded to the entry in the
  * IDT Table Request.
  */
-static unsigned long get_full_offset_by_vector(gate_desc *idt, int vector_number) {
+unsigned long get_full_offset_by_vector(gate_desc *idt, int vector_number) {
 
     gate_desc *gate_ptr;
 
@@ -377,7 +385,7 @@ static unsigned long get_full_offset_by_vector(gate_desc *idt, int vector_number
  *
  * @return: the memory address of the Asm manager associated with entry spuria remains remained.
  */
-static unsigned long get_full_offset_spurious_interrput(gate_desc *idt) {  
+unsigned long get_full_offset_spurious_interrput(gate_desc *idt) {  
   
     unsigned long address;
 
@@ -396,7 +404,7 @@ static unsigned long get_full_offset_spurious_interrput(gate_desc *idt) {
  * @return: the memory address of the Asm manager associated with the
  * Entry Invalid Opcode.
  */
-static unsigned long get_full_offset_invalid_opcode(gate_desc *idt) {
+unsigned long get_full_offset_invalid_opcode(gate_desc *idt) {
   
     unsigned long address;
 

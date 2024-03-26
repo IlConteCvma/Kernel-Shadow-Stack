@@ -2,6 +2,8 @@
 #define LOGGING_H
 
 #include <linux/workqueue.h>
+#include "kss_struct.h"
+#include "module-defines.h"
 
 
 

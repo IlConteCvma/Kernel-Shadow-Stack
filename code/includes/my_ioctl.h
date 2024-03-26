@@ -1,6 +1,8 @@
 #ifndef INSTRUM_MAP_H
 #define INSTRUM_MAP_H
 
+#include "module-defines.h"
+
 #ifdef IOCTL_INSTRUM_MAP
 #include <linux/types.h>
 #define INSTRUM_MAP _IOW('a', 'a', struct ioctl_data *)
@@ -45,10 +47,12 @@ typedef struct log_system_info {
     size_t len;
 } log_system_info;
 
+
+
 #define SECURITY_METADATA _IOW('b', 'b', log_system_info *)
 #else
 #define SECURITY_METADATA _IO('b', 'b')
-#endif //LOG_SYSTEM
+#endif 
 
 
 

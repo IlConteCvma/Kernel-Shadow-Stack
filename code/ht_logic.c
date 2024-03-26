@@ -1,4 +1,5 @@
 #include "includes/kss_hashtable.h"
+#include "includes/dirver-core.h"
 
 
 

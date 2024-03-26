@@ -65,20 +65,28 @@
 
 #ifdef LOG_SYSTEM
 /* The location in the System file and the format of log files produced by the monitoring system                       */
-#define log_path_format  "/home/cap/%s_%d_%d_log.txt";
-#define user_stack_path_format  "/home/cap/%s_%d_%d_user_stack.data";
+#define log_path_format  "/home/cap/%s_%d_%d_log.txt"
+#define user_stack_path_format  "/home/cap/%s_%d_%d_user_stack.data"
 
 /* List of strings containing the event format for the various types of events supported by architecture     */
-#define no_call_format  "[NO CALL] :Indirizzo RETURN = 0x%px\tIndirizzo di ritorno = 0x%px\n";
-#define call_format     "[CALL]    :Funzione Target  = 0x%px\tIndirizzo di ritorno = 0x%px\n";
-#define ret_ii_format   "[RET II]  :Indirizzo RETURN = 0x%px\tIndirizzo di ritorno = 0x%px\n";
-#define ret_ni_format   "[RET NI]  :Indirizzo RETURN = 0x%px\tIndirizzo di ritorno = 0x%px\n";
-#define ret_suc_format  "[RET SUC] :Indirizzo ATTESO = 0x%px\tIndirizzo EFFETTIVO  = 0x%px\tIndirizzo RETURN = 0x%px\n";
+#define no_call_format  "[NO CALL] :Address RETURN = 0x%px\tAddress di ritorno = 0x%px\n"
+#define call_format     "[CALL]    :Function Target  = 0x%px\tAddress di ritorno = 0x%px\n"
+#define ret_ii_format   "[RET II]  :Address RETURN = 0x%px\tAddress di ritorno = 0x%px\n"
+#define ret_ni_format   "[RET NI]  :Address RETURN = 0x%px\tAddress di ritorno = 0x%px\n"
+#define ret_suc_format  "[RET SUC] :Address ATTESO = 0x%px\tAddress EFFETTIVO  = 0x%px\tAddress RETURN = 0x%px\n"
 
 /* Dimensions of the strings to write in the log file after recovering the event data                     */
 int size_no_suc = 92 + 12;
 int size_suc    = 130 + 12;
 #endif //LOG_SYSTEM
+
+
+
+
+typedef void (*do_group_exit_t)(int code);
+
+do_group_exit_t do_group_exit_addr;
+
 
 
 

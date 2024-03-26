@@ -1,7 +1,8 @@
 #ifndef KSSSTRUCT_H
 #define KSSSTRUCT_H
 
-
+#include "module-defines.h"
+#include "my_ioctl.h"
 
 /**
  * stack_item - This data structure represents a set of information maintained to validate a single
@@ -83,7 +84,7 @@ typedef struct security_metadata {
 
 // Functions
 extern int check_integrity_security_metadata(unsigned long *end_of_stack);
-extern int check_errore_finish_task_switch_hook(unsigned long *end_of_stack);
+extern int check_error_finish_task_switch_hook(unsigned long *end_of_stack);
 extern int check_error_security_metadata(unsigned long *end_of_stack);
 extern stack_item *get_free_item(unsigned long *end_of_stack);
 extern void insert_free_item(stack_item *item, security_metadata *sm);
@@ -99,7 +100,7 @@ extern int check_all_return_adress(stack_item* top_stack, unsigned long user_sta
 
 #else
 extern int single_address_one_copy(stack_item* top_stack, unsigned long user_stack_address, unsigned long *return_address, security_metadata *sm);
-extern block_address(stack_item* top_stack, unsigned long user_stack_address, unsigned long *return_address, security_metadata *sm)
+extern int block_address(stack_item* top_stack, unsigned long user_stack_address, unsigned long *return_address, security_metadata *sm);
 extern int single_address(stack_item* top_stack, unsigned long user_stack_address, unsigned long *return_address, security_metadata *sm);
 extern int iter_block_address(stack_item* top_stack, unsigned long user_stack_address, unsigned long *return_address, security_metadata *sm);
 extern int check_all_return_adress(stack_item* top_stack, unsigned long user_stack_address, unsigned long *return_address, security_metadata *sm);
@@ -107,5 +108,24 @@ extern int check_all_return_adress(stack_item* top_stack, unsigned long user_sta
 
 #endif
 
+
+#ifdef SINGLE_ADDRESS_TIMER
+extern unsigned long average_time_one_byte ;
+extern unsigned long total_time_one_byte ;
+extern unsigned long counter_one_byte ;
+#endif //SINGLE_ADDRESS_TIMER
+
+#ifdef BLOCK_ADDRESS_TIMER
+extern unsigned long average_time_block ;
+extern unsigned long total_time_block;
+extern unsigned long counter_block ;
+#endif //BLOCK_ADDRESS_TIMER
+
+#ifdef TIMER_COMPARE_RET_ADDR
+extern unsigned long average_time_compare ;
+extern unsigned long total_time_compare ;
+extern unsigned long counter_compare ;
+extern int guard ;
+#endif
 
 #endif //KSSSTRUCT_H
