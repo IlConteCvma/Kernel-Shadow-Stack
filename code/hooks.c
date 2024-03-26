@@ -1203,3 +1203,163 @@ void my_spurious_handler(struct pt_regs *regs){
 #endif
     }
 }
+
+
+/**
+ * patch_IDT - It performs the binary patch by changing the operand of the education of call target.In this way, the
+ * Execution flow is diverted to the new high -level C manager associated with the event.To
+ * Restore the original content of the manager, the restoration information is saved inside
+ * of the @item data structure.
+ *
+ * @address_first_Handler: address of the actual (and correct) first level ASM manager of the event @vector_number
+ * @address_expected_c_Handler: address of the correct high -level C manager of the event @vector_number
+ * @DTR: data structure maintaining information relating to the IDT table
+ * @vector_number: numerical identification of the entry target in the IDT table
+ * @Handler: address of the new manager C to be installed instead of @address_expected_c_handler
+ * @item: data structure containing Binary Patching information
+ *
+ * @return: returns the value 1 in case of success;Otherwise, it returns the value 0.
+ */
+int patch_IDT(unsigned long address_first_handler, unsigned long address_expected_C_handler, struct desc_ptr dtr, int vector_number, void *handler, struct info_patch *item) {
+
+    int i;
+    int operand;
+    unsigned char *byte;
+    unsigned long address;
+    
+
+    /*
+     * I run a byte scan after bytes in search of call instructions in
+     * ASM manager of the event.Given a call education, its operando is calculated
+     * To determine the address that you will have to jump.We are looking for the call whose
+     * target address coincides with @address_expected_c_handler (I.E., the correct
+     * high -level C manager).For simplicity, a scan is performed which
+     * It involves more than 1024 bytes as these ASM managers are small in size.
+     */
+
+    /* Pointer at the beginning of the Asm manager        */
+    byte = (unsigned char *)address_first_handler;
+
+    for(i=0; i<1024; i++) {
+
+        /* Check whether the bite i-th represents the operating code of the CALL */
+
+        if(byte[i]==0xE8) {
+                
+                /* Calculating the operating of the education of CALL   */
+                operand = ( (int) byte[i+1]       ) |
+                          (((int) byte[i+2]) << 8 ) |
+                          (((int) byte[i+3]) << 16) |
+                          (((int) byte[i+4]) << 24);
+                
+                /* Calculation the address of the target function   */
+                address = (unsigned long) (((unsigned long)&byte[i+5]) + operand);
+
+                if(address == address_expected_C_handler) {
+
+#ifdef INFO_DEBUG
+                    pr_info("%s: [MODULE INIT] [PATCH IDT] [%d] Matching successfully found for the execution of Binary Patching\n",
+                            MOD_NAME,
+                            current->pid);
+#endif
+                    item->old_call_operand     = operand;
+                    item->new_call_operand     = (int)(((unsigned long)handler)-((unsigned long)(&byte[i+5])));
+                    item->call_operand_address = (unsigned int *) &byte[i+1];
+
+                    cr0 = read_cr0();
+                    unprotect_memory();
+
+                    /* I modify the operating of current call education on which I have Matching */
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,17,0)
+                    arch_cmpxchg(item->call_operand_address, item->old_call_operand, item->new_call_operand);
+#else
+                    cmpxchg(item->call_operand_address, item->old_call_operand, item->new_call_operand);
+#endif
+
+                    /* Except for the current descriptor of the IDT table associated with the requested carrier */
+                    memcpy(&(item->old_entry), (void*)(dtr.address + vector_number * sizeof(gate_desc)), sizeof(gate_desc));
+
+	                /* Comparison The new gate so that it can be invoked User side */
+                    pack_gate(&(item->my_trap_desc), GATE_INTERRUPT, address_first_handler, 0x3, 0, 0);
+
+                    /* I update the entries of the IDT table  */
+                    write_idt_entry((gate_desc*)dtr.address, vector_number, &(item->my_trap_desc));
+
+                    protect_memory();
+
+                    return 1;
+                }                            
+        }
+    }
+
+    return 0;
+}
+
+
+
+/**
+ * install_kprobes - KPROBES installation necessary to correctly use security architecture.
+ * The hook on the do_exit () allows you to dealocate the data structures used in architecture while the hooks on the
+ * Finish_task_Switch () allow you to allocar them and initialize them.The hook on the kernel_clone () allows you to use
+ * correctly the reference counter in order to dealut the data structures shared by the threads of the same
+ * process and to be dismantled the kernel module correctly.
+ *
+ * @return: return 1 if all the kProbe have been successfully allocated;Otherwise, it returns the value 0.
+ */
+int install_kprobes(void) {
+    
+    int ret;
+
+
+    /* Install the proe kernels on the finish_task_switch() */
+    ret = register_kprobe(&kp_finish_task_switch);
+
+    if(ret < 0) {
+        pr_err("%s: [ERROR MODULE INIT] [INSTALLATION KPROBE] [%d] Error in the recording of the KPROBE #1 on 'finish_task_switch()'\n",
+        MOD_NAME,
+        current->pid);
+        return 0;
+    }
+
+    ret = register_kprobe(&kp_finish_task_switch_cold);
+
+    if(ret < 0) {
+        unregister_kprobe(&kp_finish_task_switch);
+        pr_err("%s: [ERROR MODULE INIT] [INSTALLATION KPROBE] [%d] Error in the recording of the KPROBE #2 on 'finish_task_switch()'\n",
+        MOD_NAME,
+        current->pid);
+        return 0;
+    }
+
+    /* Install the KPROBE on the do_exit()                 */
+    ret = register_kprobe(&kp_do_exit);
+
+    if(ret < 0) {
+        unregister_kprobe(&kp_finish_task_switch);
+        unregister_kprobe(&kp_finish_task_switch_cold);
+        pr_err("%s: [ERROR MODULE INIT] [INSTALLATION KPROBE] [%d] Error in the recording of the KPROBE on the 'do_exit()'\n",
+        MOD_NAME,
+        current->pid);
+        return 0;
+    }
+
+    /* Install the KPROBE on the kernel_clone()                 */
+    ret = register_kprobe(&kp_kernel_clone);
+
+    if(ret < 0) {
+        unregister_kprobe(&kp_finish_task_switch);
+        unregister_kprobe(&kp_finish_task_switch_cold);
+        unregister_kprobe(&kp_do_exit);
+        pr_err("%s: [ERROR MODULE INIT] [INSTALLATION KPROBE] [%d] Error in the recording of the KPROBE on the 'kernel_clone()'\n",
+        MOD_NAME,
+        current->pid);
+        return 0;
+    }
+
+    pr_info("%s: [MODULE INIT] [INSTALLATION KPROBE] [%d] Recording of the hooks successfully taken place\n",
+    MOD_NAME,
+    current->pid);
+
+    return 1;
+}

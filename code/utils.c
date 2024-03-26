@@ -348,3 +348,61 @@ int check_int_0xFF(unsigned long call_instr_addr, security_metadata *sm) {
 #endif
 
 
+/**
+ * get_full_offset_by_vector - Calculate the memory address of the manager associated with the number
+ * of vector required.
+ *
+ * @idt: memory address of the IDT table
+ * @vector_number: numerical identification of the entry in the IDT target table
+ *
+ * @return: returns the memory address of the Asm manager corresponded to the entry in the
+ * IDT Table Request.
+ */
+static unsigned long get_full_offset_by_vector(gate_desc *idt, int vector_number) {
+
+    gate_desc *gate_ptr;
+
+
+    gate_ptr = (gate_desc *)((unsigned long)idt + vector_number * sizeof(gate_desc));
+    return (unsigned long)HML_TO_ADDR(gate_ptr->offset_high,
+                                      gate_ptr->offset_middle,
+                                      gate_ptr->offset_low);
+}
+
+/**
+ * get_full_offset_spurious_interrput - Recovers the memory address of the Asm Associate Manager
+ * to entry spuria.
+ *
+ * @idt: memory address of the IDT table
+ *
+ * @return: the memory address of the Asm manager associated with entry spuria remains remained.
+ */
+static unsigned long get_full_offset_spurious_interrput(gate_desc *idt) {  
+  
+    unsigned long address;
+
+
+    address = get_full_offset_by_vector(idt, SPURIOUS_APIC_VECTOR);
+    return address;
+}
+
+
+/**
+ * get_full_offset_invalid_opcode - Recovers the memory address of the Asm Associate Manager
+ * to the Invalid Opcode event.
+ *
+ * @idt: memory address of the IDT table
+ *
+ * @return: the memory address of the Asm manager associated with the
+ * Entry Invalid Opcode.
+ */
+static unsigned long get_full_offset_invalid_opcode(gate_desc *idt) {
+  
+    unsigned long address;
+
+
+    address = get_full_offset_by_vector(idt, X86_TRAP_UD);
+    return address;
+}
+
+

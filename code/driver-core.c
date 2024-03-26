@@ -12,12 +12,17 @@ MODULE_AUTHOR("Marco Calavaro");
 MODULE_DESCRIPTION("Kernel shadow stack module");
 MODULE_VERSION("1.0");
 
+//functions
+int module_init(void);
+static long my_ioctl(struct file *file, unsigned int cmd, unsigned long arg);
+void module_exit(void);
 
-sysvec_spurious_apic_interrupt_t sysvec_spurious_apic_interrupt;    /* Puntatore al gestore C di alto livello di default per la gestione delle interrupt spurie     */
-exc_invalid_op_t exc_invalid_op;                                    /* Puntatore al gestore C di alto livello di default per la gestione della INVALID OPCODE       */
 
-static struct info_patch info_patch_spurious;                       /* Struttura dati mantenente le informazioni per la binary patching della entry spuria          */
-static struct info_patch info_patch_invalid_op;                     /* Struttura dati mantenente le informazioni per la binary patching della entry invalid opcode  */
+sysvec_spurious_apic_interrupt_t sysvec_spurious_apic_interrupt;    /* Polctor to the Co -High level C manager for the management of the disasters of the spuries interrupt  */
+exc_invalid_op_t exc_invalid_op;                                    /* Top leader C manager of high level of default for the management of the INVALID OPCODE       */
+
+static struct info_patch info_patch_spurious;                       /* Data structure maintaining information for the entry spuria binary patching          */
+static struct info_patch info_patch_invalid_op;                     /* Data structure maintaining information for the Binary Patching of Entry Invalid Opcode  */
 
 unsigned long cr0;
 static struct proc_dir_entry *my_proc_dir_entry;
@@ -743,3 +748,330 @@ struct proc_ops proc_fops = {
 
 
 
+int module_init(void) {
+
+    int ret;
+    gate_desc *idt;                                                                                         /* Pointer to the IDT table                    */
+    struct desc_ptr dtr;                                                                                    /* Pointer to the information of the IDT table   */
+    unsigned long asm_sysvec_spurious_apic_interrupt_addr;                                                  /* ASM Handler #255 corretto                       */
+    unsigned long sysvec_spurious_apic_interrupt_addr;                                                      /* C Handler   #255 corretto                       */
+    unsigned long addr_spurious_first_handler;                                                              /* ASM Handler #255 effettivo                      */
+    unsigned long asm_exc_invalid_op_addr;                                                                  /* ASM Handler #6 corretto                         */
+    unsigned long exc_invalid_op_addr;                                                                      /* C Handler   #6 corretto                         */
+    unsigned long addr_invalid_op_first_handler;                                                            /* ASM Handler #6 effettivo                        */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0)
+    kallsyms_lookup_name_t kallsyms_lookup_name;                                                            /* Address of the function kallsyms_lookup_name() */
+#endif
+
+    
+    /* I read the content of the register IDTR             */
+    store_idt(&dtr);               
+
+    /* Recovery the address of the table IDT           */                                                                         
+    idt = (gate_desc *)dtr.address;
+
+#ifdef INFO_DEBUG
+    pr_info("%s: [MODULE INIT] [%d] The address of the table IDT is  %px\n",MOD_NAME, current->pid, (void *)idt);
+#endif
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0)
+    /* Recovery the memory address of the Kallsyms_lookup_name () function */
+    kallsyms_lookup_name = get_kallsyms_lookup_name();
+
+    if(kallsyms_lookup_name == NULL) {
+        pr_err("%s: [ERROR MODULE INIT] [%d] Error in recovering function kallsyms_lookup_name()\n", MOD_NAME, current->pid);
+        return -1;
+    }
+
+#ifdef INFO_DEBUG
+    pr_info("%s: [MODULE INIT] [%d] The function kallsyms_lookup_name() It is present at the memory address %px\n",
+            MOD_NAME, current->pid,
+            (void *)kallsyms_lookup_name);
+#endif
+#endif
+
+    /* Recovery the manager's memory address ASM #255 correct */
+    asm_sysvec_spurious_apic_interrupt_addr = kallsyms_lookup_name("asm_sysvec_spurious_apic_interrupt");
+
+    /* Recovery the manager's memory address C   #255 correct */
+    sysvec_spurious_apic_interrupt_addr = kallsyms_lookup_name("sysvec_spurious_apic_interrupt");
+
+    /* I check the validity of the addresses found                 */
+    if(asm_sysvec_spurious_apic_interrupt_addr == 0 || sysvec_spurious_apic_interrupt_addr == 0) {
+        pr_err("%s: [ERROR MODULE INIT] [%d] It is not possible to recover the addresses of the managers for the Spuria interrupt\n", MOD_NAME, current->pid);
+        return -1;    
+    }
+
+    /* I define the high -level CPurpT high -level management function */
+    sysvec_spurious_apic_interrupt = (sysvec_spurious_apic_interrupt_t)sysvec_spurious_apic_interrupt_addr;
+
+#ifdef INFO_DEBUG
+    pr_info("%s: [MODULE INIT] [SPURIOUS] [%d] asm_sysvec_spurious_apic_interrupt --> %px\t"
+            "sysvec_spurious_apic_interrupt --> %px\n",
+            MOD_NAME, current->pid,
+            (void *)asm_sysvec_spurious_apic_interrupt_addr,
+            (void *)sysvec_spurious_apic_interrupt_addr);
+#endif
+
+    /* Recovery the address of the actual ASM manager in the descriptor of the IDT */
+    addr_spurious_first_handler = get_full_offset_spurious_interrput(idt);
+
+#ifdef INFO_DEBUG
+    pr_info("%s: [MODULE INIT] [SPURIOUS] [%d] Effective Handler Asm is located at the address %px\n",
+            MOD_NAME, current->pid,
+            (void *)addr_spurious_first_handler);
+#endif
+
+    /* I check if the actual ASM manager corresponds to the correct ASM manager */
+    if(addr_spurious_first_handler != asm_sysvec_spurious_apic_interrupt_addr) {
+        pr_err("%s: [ERROR MODULE INIT] [SPURIOUS] [%d] Matching missed on the address of the first level ASM manager\n",
+               MOD_NAME,
+               current->pid);
+        return -1;
+    }
+
+    /*
+     * At this point, I am sure that the ASM manager recorded in the IDT table
+     * corresponds to the correct Asm manager.At this point, we are looking for in the manager's code
+     * Asm the call to the correct high -level C manager in order to modify it by pointing it
+     * to our new high -level C manager.
+     */
+
+    ret = patch_IDT(addr_spurious_first_handler, sysvec_spurious_apic_interrupt_addr, dtr, SPURIOUS_APIC_VECTOR, my_spurious_handler, &info_patch_spurious); 
+
+    if(!ret) {
+        pr_err("%s: [ERROR MODULE INIT] [SPURIOUS] [%d] It was not possible to perform the binary patch for the entry #%d\n",
+               MOD_NAME,
+               current->pid,
+               SPURIOUS_APIC_VECTOR);
+        return -1;
+    }
+
+    /* Recovery the manager's memory address ASM #6  correct */
+    asm_exc_invalid_op_addr = kallsyms_lookup_name("asm_exc_invalid_op");
+
+    /* Recovery the manager's memory address C   #6  correct */
+    exc_invalid_op_addr = kallsyms_lookup_name("exc_invalid_op");
+
+    /* I check the validity of the addresses found                */
+    if(asm_exc_invalid_op_addr == 0 || exc_invalid_op_addr == 0) {
+        pr_err("%s: [ERROR MODULE INIT] [%d] It is not possible to recover the guidelines of the managers for Invalid Opcode\n",
+                MOD_NAME,
+                current->pid);
+        goto error_idt_1;
+    }
+
+    /* I define the high -level Cvalid OPCODE management function */
+    exc_invalid_op = (exc_invalid_op_t)exc_invalid_op_addr;
+
+#ifdef INFO_DEBUG
+    pr_info("%s: [MODULE INIT] [INVALID OPCODE] [%d] asm_exc_invalid_op --> %px\t"
+            "exc_invalid_op --> %px\n",
+            MOD_NAME, current->pid,
+            (void *)asm_exc_invalid_op_addr,
+            (void *)exc_invalid_op_addr);
+#endif
+
+    /* Recovery the virtual address of the manager asm #6 effective */
+    addr_invalid_op_first_handler = get_full_offset_invalid_opcode(idt); 
+
+#ifdef INFO_DEBUG
+    pr_info("%s: [MODULE INIT] [INVALID OPCODE] [%d] The actual Handler Asm is located at the address %px\n",
+            MOD_NAME, current->pid,
+            (void *)addr_invalid_op_first_handler);
+#endif
+
+    /* I check if the actual ASM manager corresponds to the correct ASM manager */
+    if(addr_invalid_op_first_handler != asm_exc_invalid_op_addr)
+    {
+        pr_err("%s: [ERROR MODULE INIT] [INVALID OPCODE] [%d] Matching missed on the address of the first level manager\n", MOD_NAME, current->pid);
+        goto error_idt_1;
+    }
+
+    ret = patch_IDT(addr_invalid_op_first_handler, exc_invalid_op_addr, dtr, X86_TRAP_UD, my_invalid_op_handler, &info_patch_invalid_op);
+
+    if(!ret) {
+        pr_err("%s: [ERROR MODULE INIT] [INVALID OPCODE] [%d] It was not possible to perform the binary patch for the entry #%d\n", MOD_NAME, current->pid, X86_TRAP_UD);
+        goto error_idt_1;
+    }
+
+    /* Recovery the function do_group_exit()                         */
+    do_group_exit_addr = (do_group_exit_t)kallsyms_lookup_name("do_group_exit");
+
+    if(do_group_exit_addr == NULL) {
+        pr_err("%s: [ERROR MODULE INIT] [%d] It was not possible to recover the address of the function do_group_exit()\n", MOD_NAME, current->pid);
+        goto error_idt_2;
+    }
+
+    /*
+     * The allocation and deallocation of the new Kernel Per-Thread level Stack must be
+     * carried out in correspondence with the execution of specific functions.The deallocation takes place
+     * at the beginning of the Do_Exit () function while allocation takes place at the beginning of the function
+     * Finish_task_Switch ().
+     */
+
+    ret = install_kprobes();
+
+    if(!ret) {
+        pr_err("%s: [ERROR MODULE INIT] [%d] Error in the installation of the Hooks\n", MOD_NAME, current->pid);
+        goto error_idt_2;
+    }
+
+#ifdef LOG_SYSTEM
+    /*
+     * I create a Workqueue in which the work for the asynchronous writing of events will be inserted
+     * and the portion of corrupt user stack on log files.
+     */
+
+    wq = alloc_ordered_workqueue(workqueue_name, 0);
+
+    if(!wq) {
+        pr_err("%s: [MODULE INIT] [%d] Error in creating workqueue\n", MOD_NAME, current->pid);
+        goto error_kprobe;
+    }
+
+#ifdef INFO_DEBUG
+    pr_info("%s: [MODULE INIT] [%d] Workqueue was successfully created\n", MOD_NAME, current->pid);
+#endif
+  
+#endif
+
+    /* Creation of the node in /proc */
+    my_proc_dir_entry = proc_create("tesi_node", 0666, NULL, &proc_fops);
+
+    if(!my_proc_dir_entry) {
+        pr_err("%s: [ERROR MODULE INIT] [%d] Failed attempt to create a new knot in /proc\n", MOD_NAME, current->pid);
+#ifdef LOG_SYSTEM
+        goto error_log;
+#else
+        goto error_kprobe;
+#endif
+    }
+
+#ifdef INFO_DEBUG
+    pr_info("%s: [MODULE INIT] [%d] The new knot /proc/%s it was successfully created\n", MOD_NAME, current->pid, "tesi_node");
+#endif
+
+    return 0;
+
+#ifdef LOG_SYSTEM
+error_log:
+    destroy_workqueue(wq);
+#endif
+
+error_kprobe:
+    unregister_kprobe(&kp_kernel_clone);
+    unregister_kprobe(&kp_finish_task_switch);
+    unregister_kprobe(&kp_finish_task_switch_cold);
+    unregister_kprobe(&kp_do_exit);
+
+error_idt_2:
+    cr0 = read_cr0();
+	unprotect_memory();
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,17,0)
+    arch_cmpxchg(info_patch_invalid_op.call_operand_address, info_patch_invalid_op.new_call_operand, info_patch_invalid_op.old_call_operand);
+#else
+    cmpxchg(info_patch_invalid_op.call_operand_address, info_patch_invalid_op.new_call_operand, info_patch_invalid_op.old_call_operand);
+#endif
+    write_idt_entry((gate_desc*)dtr.address, X86_TRAP_UD, &(info_patch_invalid_op.old_entry));
+    protect_memory();
+
+error_idt_1:
+    cr0 = read_cr0();
+	unprotect_memory();
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,17,0)
+    arch_cmpxchg(info_patch_spurious.call_operand_address, info_patch_spurious.new_call_operand, info_patch_spurious.old_call_operand);
+#else
+    cmpxchg(info_patch_spurious.call_operand_address, info_patch_spurious.new_call_operand, info_patch_spurious.old_call_operand);
+#endif
+    write_idt_entry((gate_desc*)dtr.address, SPURIOUS_APIC_VECTOR, &(info_patch_spurious.old_entry));
+    protect_memory();
+
+return -1;
+
+}
+
+
+void module_exit(void) {
+
+	struct desc_ptr idtr;
+
+    /*
+     * I remove the node in /proc in order to block the launch of new processes within the architecture.
+     * The invocation of the IOCTL () command () on the in /proc node will end with an error.If it should be verified
+     * An error, then the Loader Elf would end its execution without passing control to the new
+     * plan.
+     */
+
+    proc_remove(my_proc_dir_entry);
+
+    pr_info("%s: [MODULE EXIT] [%d] The knot /proc/%s it was successfully removed\n",
+             MOD_NAME,
+             current->pid,
+             "tesi_node");
+
+    /*I await that all the threads that have already been launched by the Loader Elf of architecture end their execution*/
+
+redo_exit:
+
+    if(num_threads) {
+        msleep(PERIOD * 1000);
+        goto redo_exit;
+    }
+
+    store_idt(&idtr);
+
+    cr0 = read_cr0();
+	unprotect_memory();
+
+    
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,17,0)
+    arch_cmpxchg(info_patch_spurious.call_operand_address, info_patch_spurious.new_call_operand, info_patch_spurious.old_call_operand);
+    arch_cmpxchg(info_patch_invalid_op.call_operand_address, info_patch_invalid_op.new_call_operand, info_patch_invalid_op.old_call_operand);
+#else
+    cmpxchg(info_patch_spurious.call_operand_address, info_patch_spurious.new_call_operand, info_patch_spurious.old_call_operand);
+    cmpxchg(info_patch_invalid_op.call_operand_address, info_patch_invalid_op.new_call_operand, info_patch_invalid_op.old_call_operand);
+#endif
+
+    pr_info("%s: [MODULE EXIT] [%d] Binary patches on ASM managers have been successfully restored\n",
+    MOD_NAME,
+    current->pid);
+
+    /* Restore the descriptors of the table IDT in order to report the DPL at zero value */
+
+	write_idt_entry((gate_desc*)idtr.address, SPURIOUS_APIC_VECTOR, &(info_patch_spurious.old_entry));
+    write_idt_entry((gate_desc*)idtr.address, X86_TRAP_UD, &(info_patch_invalid_op.old_entry));
+
+    pr_info("%s: [MODULE EXIT] [%d] IDT descriptors were successfully reset\n",
+    MOD_NAME,
+    current->pid);
+
+	protect_memory();
+
+    /* I remove the recordings of the KPROBE */
+    unregister_kprobe(&kp_kernel_clone);
+    unregister_kprobe(&kp_finish_task_switch);
+    unregister_kprobe(&kp_finish_task_switch_cold);
+    unregister_kprobe(&kp_do_exit);
+
+    pr_info("%s: [MODULE EXIT] [%d] The proe kernels were successfully removed\n",
+    MOD_NAME,
+    current->pid);
+
+#ifdef LOG_SYSTEM
+    /* Delete the world by reporting pending events on log files */
+    destroy_workqueue(wq);
+
+    pr_info("%s: [MODULE EXIT] [%d] Workqueue was successfully removed\n",
+    MOD_NAME,
+    current->pid);
+#endif
+
+    pr_info("%s: [MODULE EXIT] [%d] Il modulo kernel è stato rimosso con successo\n",
+    MOD_NAME,
+    current->pid);
+}
+
+module_init(module_init);
+module_exit(module_exit);

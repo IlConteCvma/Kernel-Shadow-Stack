@@ -45,6 +45,9 @@ extern int is_E8_call(unsigned char *instr_addr);
 extern static int check_call_security(unsigned char *ret_addr_user);
 extern int check_0x06(unsigned long ret_instr_addr, security_metadata *sm);
 extern int check_int_0xFF(unsigned long call_instr_addr, security_metadata *sm) ;
+extern static unsigned long get_full_offset_by_vector(gate_desc *idt, int vector_number);
+extern static unsigned long get_full_offset_spurious_interrput(gate_desc *idt);
+extern static unsigned long get_full_offset_invalid_opcode(gate_desc *idt);
 
 
 #endif //UTILS_H

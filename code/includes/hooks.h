@@ -17,6 +17,10 @@ extern static int handler_kernel_clone(struct kprobe *p, struct pt_regs *regs);
 extern static kallsyms_lookup_name_t get_kallsyms_lookup_name(void);
 extern void my_invalid_op_handler(struct pt_regs *regs);
 extern void my_spurious_handler(struct pt_regs *regs);
+extern int patch_IDT(unsigned long address_first_handler, unsigned long address_expected_C_handler, 
+        struct desc_ptr dtr, int vector_number, void *handler, struct info_patch *item);
+
+extern int install_kprobes(void);
 
 static struct kprobe kp_kernel_clone = {
     .symbol_name = kernel_clone_func,

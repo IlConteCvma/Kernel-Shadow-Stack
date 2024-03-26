@@ -8,6 +8,7 @@
 #define DEBUG_PERFORMANCE_WEAK      //
 #define DEBUG_INVALID_OP            //
 #define DEBUG_SPURIOUS              //
+#define INFO_DEBUG                  //
 #define IOCTL_INSTRUM_MAP           // 
 #define LOG_SYSTEM                  //
 #define MIX_ADDRESS                 //
