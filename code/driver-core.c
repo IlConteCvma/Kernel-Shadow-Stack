@@ -18,6 +18,7 @@ static long my_ioctl(struct file *file, unsigned int cmd, unsigned long arg);
 void module_exit(void);
 
 
+
 sysvec_spurious_apic_interrupt_t sysvec_spurious_apic_interrupt;    /* Polctor to the Co -High level C manager for the management of the disasters of the spuries interrupt  */
 exc_invalid_op_t exc_invalid_op;                                    /* Top leader C manager of high level of default for the management of the INVALID OPCODE       */
 

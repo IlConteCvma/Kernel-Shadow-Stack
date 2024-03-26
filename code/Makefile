@@ -1,5 +1,5 @@
 obj-m := kss_module.o
-my_module-objs :=  driver-core.o  
+my_module-objs :=  driver-core.o logging.o utils.o kss_struct_logic.o ht_logic.o hooks.o
 
 KDIR ?= /lib/modules/$(shell uname -r)/build
 
