@@ -1,7 +1,7 @@
 #ifndef KSSSTRUCT_H
 #define KSSSTRUCT_H
 
-#include "module-defines.h"
+//#include "module-defines.h"
 #include "my_ioctl.h"
 
 /**

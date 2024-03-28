@@ -4,7 +4,7 @@
 
 #include <linux/fs.h>
 #include "kss_struct.h"
-#include "module-defines.h"
+//#include "module-defines.h"
 
 /* Allows you to reconstruct the address of the ASM manager stored in the entry of the IDT table                        */
 #define HML_TO_ADDR(h,m,l)      ((unsigned long) (l) | ((unsigned long) (m) << 16) | ((unsigned long) (h) << 32))
