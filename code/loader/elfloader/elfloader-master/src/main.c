@@ -9,6 +9,7 @@
 #include <unistd.h>
 
 #include <reflect.h>
+#include "conf.h"
 
 int main(int argc, char **argv)
 {

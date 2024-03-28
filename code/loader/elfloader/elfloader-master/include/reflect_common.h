@@ -3,6 +3,8 @@
 
 #include <limits.h>
 
+#include "conf.h"
+
 #ifndef PAGE_SIZE
 #define PAGE_SIZE 0x1000
 #endif
