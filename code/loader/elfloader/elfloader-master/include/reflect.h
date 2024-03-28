@@ -5,6 +5,8 @@
 #include <link.h>
 #include <stdbool.h>
 
+#include "conf.h"
+
 /*
  * Config
  */

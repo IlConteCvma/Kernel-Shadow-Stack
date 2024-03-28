@@ -2,6 +2,8 @@
 #define REFLECT_COMMON_H
 
 #include <limits.h>
+//#include <stdio.h>
+
 
 #include "conf.h"
 
@@ -9,7 +11,7 @@
 #define PAGE_SIZE 0x1000
 #endif
 
-#if DEBUG
+#ifdef DEBUG
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
