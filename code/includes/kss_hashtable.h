@@ -5,7 +5,7 @@
 //#include "module-defines.h"
 
 #if defined(IOCTL_INSTRUM_MAP) || defined(LOG_SYSTEM)
-extern struct hlist_head ht_kss[8];
+extern struct hlist_head ht_kss[8]; //in ht_logic.c
 
 /**
  * HT_ITEM - Single element of the hash table

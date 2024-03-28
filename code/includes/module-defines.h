@@ -76,8 +76,8 @@
 #define ret_suc_format  "[RET SUC] :Address ATTESO = 0x%px\tAddress EFFETTIVO  = 0x%px\tAddress RETURN = 0x%px\n"
 
 /* Dimensions of the strings to write in the log file after recovering the event data                     */
-extern int size_no_suc ;
-extern int size_suc    ;
+extern int size_no_suc ; //in driver-core.c
+extern int size_suc    ; //in driver-core.c
 #endif //LOG_SYSTEM
 
 
@@ -85,7 +85,7 @@ extern int size_suc    ;
 
 typedef void (*do_group_exit_t)(int code);
 
-extern do_group_exit_t do_group_exit_addr;
+extern do_group_exit_t do_group_exit_addr; //in driver-core.c
 
 
 
