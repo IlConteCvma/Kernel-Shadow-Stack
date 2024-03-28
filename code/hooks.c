@@ -1,10 +1,10 @@
-#include "includes/module-defines.h"
+//#include "includes/module-defines.h"
 #include "includes/utils.h"
 #include "includes/hooks.h"
 #include "includes/kss_hashtable.h"
 #include "includes/logging.h"
-#include "includes/kss_struct.h"
-#include "includes/dirver-core.h"
+//#include "includes/kss_struct.h"
+//#include "includes/dirver-core.h"
 
 
 /**
@@ -166,7 +166,7 @@ int handler_finish_task_switch(struct kprobe *pk, struct pt_regs *regs) {
 
             /* Iter on the elements that fall into the bucket associated with the address of the MM structure of the current thread */
 
-            hash_for_each_possible(ht_tesi, data, ht_list_next, (unsigned long)current->mm) {
+            hash_for_each_possible(ht_kss, data, ht_list_next, (unsigned long)current->mm) {
             
                 /* I check if the current element is associated with the current thread mm.If positive, the current thread is not the main thread. */
                 if((unsigned long)data->mm_address == (unsigned long)current->mm) {
@@ -353,7 +353,7 @@ next_step_exit:
          * or has never been inserted.
          */
 
-        hash_for_each_possible(ht_tesi, data, ht_list_next, (unsigned long)current->mm) {
+        hash_for_each_possible(ht_kss, data, ht_list_next, (unsigned long)current->mm) {
 
             /* I check if the current element is the one associated with the current process*/
             if((unsigned long)data->mm_address == (unsigned long)current->mm) {
@@ -459,7 +459,7 @@ int handler_kernel_clone(struct kprobe *p, struct pt_regs *regs) {
 
 #if defined(IOCTL_INSTRUM_MAP) || defined(LOG_SYSTEM)
         /* Recovery the reference to the element in the HT associated with the process to which the current thread belongs */
-        hash_for_each_possible(ht_tesi, data, ht_list_next, (unsigned long)current->mm) {
+        hash_for_each_possible(ht_kss, data, ht_list_next, (unsigned long)current->mm) {
 
             if((unsigned long)(data->mm_address) == (unsigned long)current->mm) {
 

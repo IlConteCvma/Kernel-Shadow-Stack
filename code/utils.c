@@ -1,5 +1,5 @@
 #include "includes/utils.h"
-#include "includes/module-defines.h"
+//#include "includes/module-defines.h"
 
 
 #include <linux/kprobes.h>
@@ -8,6 +8,13 @@
 
 //Global var
 unsigned long cr0;
+
+/* The offset avoids the overwriting of the possible thread_info structure in the original Stack Kernel                 */
+#ifdef CONFIG_THREAD_INFO_IN_TASK
+int offset_thread_info = sizeof(struct thread_info);
+#else
+int offset_thread_info = 0; 
+#endif
 
 /**
  * get_absolute_pathname - obtains the name of the executable program of which the process is currently in

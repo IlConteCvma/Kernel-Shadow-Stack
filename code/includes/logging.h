@@ -6,14 +6,14 @@
 //#include "module-defines.h"
 
 
-
 #ifdef LOG_SYSTEM
 /* Workqueue name */
-const char *workqueue_name = "workqueue_kss";
+extern const char *workqueue_name;
 
 /* Workqueue for the asynchronous writing of events and the portion of corrupt user stack on log files */
-struct workqueue_struct *wq;
+extern struct workqueue_struct *wq;
 #endif
+
 
 
 /**

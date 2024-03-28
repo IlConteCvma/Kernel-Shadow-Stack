@@ -5,19 +5,7 @@
 //#include "module-defines.h"
 
 #if defined(IOCTL_INSTRUM_MAP) || defined(LOG_SYSTEM)
-
-
-/*
- * This hash table is used to maintain the references to information that is shared among the threads of
- * the same process.The threads of the same process share the Memory Management data structure located a
- * A specific memory address.This memory address can be used to search for information
- * relating to the various threads.A reference couunter is used that keeps track of the number of threads they have
- * recovered the references to shared information.When the counter becomes zero then it is possible to remove
- * the element from the hash table.
- */
-
-// TODO modify name
-DEFINE_HASHTABLE(ht_tesi, 3);
+extern struct hlist_head ht_kss[8];
 
 /**
  * HT_ITEM - Single element of the hash table

@@ -1,6 +1,17 @@
 #include "includes/kss_hashtable.h"
 #include "includes/dirver-core.h"
 
+/*
+ * This hash table is used to maintain the references to information that is shared among the threads of
+ * the same process.The threads of the same process share the Memory Management data structure located a
+ * A specific memory address.This memory address can be used to search for information
+ * relating to the various threads.A reference couunter is used that keeps track of the number of threads they have
+ * recovered the references to shared information.When the counter becomes zero then it is possible to remove
+ * the element from the hash table.
+ */
+
+// TODO modify name
+DEFINE_HASHTABLE(ht_kss, 3);
 
 
 /**
@@ -16,7 +27,7 @@ void delete_ht_item(void) {
     found = 0;
 
     /* Resear the element to be removed in the hash table*/
-    hash_for_each_possible(ht_tesi, data, ht_list_next, (unsigned long)current->mm) {
+    hash_for_each_possible(ht_kss, data, ht_list_next, (unsigned long)current->mm) {
             
         /* I check if the current element is associated with the current thread mm */
         if((unsigned long)data->mm_address == (unsigned long)current->mm) {
@@ -62,7 +73,7 @@ int check_already_exists(char *program_name, int id_user) {
 
     found = 0;
 
-    hash_for_each(ht_tesi, bkt, data, ht_list_next) {
+    hash_for_each(ht_kss, bkt, data, ht_list_next) {
         if(!strcmp(data->lsi->program_name, program_name) && ((data->lsi)->id_user == id_user)) {
             found = 1;
             break;

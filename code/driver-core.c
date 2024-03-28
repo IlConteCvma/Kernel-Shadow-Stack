@@ -1,10 +1,12 @@
-#include "includes/dirver-core.h"
-#include "includes/module-defines.h"
-#include "includes/utils.h"
-#include "includes/kss_struct.h"
+//#include "includes/dirver-core.h"
 #include "includes/hooks.h"
-#include "includes/my_ioctl.h"
 #include "includes/kss_hashtable.h"
+//#include "includes/module-defines.h"
+#include "includes/utils.h"
+//#include "includes/kss_struct.h"
+
+//#include "includes/my_ioctl.h"
+
 #include "includes/logging.h"
 
 MODULE_LICENSE("GPL");
@@ -18,6 +20,12 @@ static long my_ioctl(struct file *file, unsigned int cmd, unsigned long arg);
 void kss_module_exit(void);
 
 int num_threads = 0;
+do_group_exit_t do_group_exit_addr;
+
+#ifdef LOG_SYSTEM
+int size_no_suc = 92 + 12;
+int size_suc    = 130 + 12;
+#endif
 
 sysvec_spurious_apic_interrupt_t sysvec_spurious_apic_interrupt;    /* Pointer to the Co -High level C manager for the management of the disasters of the spuries interrupt  */
 exc_invalid_op_t exc_invalid_op;                                    /* Top leader C manager of high level of default for the management of the INVALID OPCODE       */
@@ -192,7 +200,7 @@ static long my_ioctl(struct file *file, unsigned int cmd, unsigned long arg) {
                 item->lsi = sm->lsi;
 
                 /* I insert the element inside the hash table*/
-                hash_add(ht_tesi, &(item->ht_list_next), item->mm_address);
+                hash_add(ht_kss, &(item->ht_list_next), item->mm_address);
 #endif
                 /*I become again de-firmable */
                 preempt_enable();
@@ -442,7 +450,7 @@ static long my_ioctl(struct file *file, unsigned int cmd, unsigned long arg) {
             item->lsi = sm->lsi;
 
             /* I insert the element inside the hash table */
-            hash_add(ht_tesi, &(item->ht_list_next), item->mm_address);
+            hash_add(ht_kss, &(item->ht_list_next), item->mm_address);
 
 #endif //LOG_SYSTEM
 
@@ -642,7 +650,7 @@ no_ret:
 
             found = 0;
 
-            hash_for_each_possible(ht_tesi, data, ht_list_next, (unsigned long)current->mm) {
+            hash_for_each_possible(ht_kss, data, ht_list_next, (unsigned long)current->mm) {
             
                 /* I check if the current element is associated with the current thread mm */
                 if((unsigned long)data->mm_address == (unsigned long)current->mm) {
@@ -687,7 +695,7 @@ no_ret:
             item->instrum_map_address = (unsigned long)my_ioctl_data;
 
             /* I insert the element inside the hash table */
-            hash_add(ht_tesi, &(item->ht_list_next), item->mm_address);
+            hash_add(ht_kss, &(item->ht_list_next), item->mm_address);
 #endif //LOG_SYSTEM
 
             break;
@@ -716,7 +724,7 @@ map_error_2:
 map_error_1:
 
 #ifdef LOG_SYSTEM
-    /* If the monitoring system is active, then an element in the HT_Tesi has been included in the previous command*/
+    /* If the monitoring system is active, then an element in the ht_kss has been included in the previous command*/
     delete_ht_item();
 #endif
 

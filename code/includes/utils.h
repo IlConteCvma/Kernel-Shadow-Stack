@@ -11,9 +11,9 @@
 
 /* The offset avoids the overwriting of the possible thread_info structure in the original Stack Kernel                 */
 #ifdef CONFIG_THREAD_INFO_IN_TASK
-int offset_thread_info = sizeof(struct thread_info);
+extern int offset_thread_info ;
 #else
-int offset_thread_info = 0; 
+extern int offset_thread_info ; 
 #endif
 
 /* Get the base of the original current thread stack kernel                                                    */

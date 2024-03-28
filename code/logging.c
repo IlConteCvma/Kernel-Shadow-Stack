@@ -1,6 +1,14 @@
 #include "includes/logging.h"
 #include "includes/utils.h"
-#include "includes/module-defines.h"
+//#include "includes/module-defines.h"
+
+#ifdef LOG_SYSTEM
+/* Workqueue name */
+const char *workqueue_name = "workqueue_kss";
+
+/* Workqueue for the asynchronous writing of events and the portion of corrupt user stack on log files */
+struct workqueue_struct *wq;
+#endif
 
 /**
  * Flush_buffer_log - It is performed by the Kernel Worker Daemon to bring events back to files

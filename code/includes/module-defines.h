@@ -76,8 +76,8 @@
 #define ret_suc_format  "[RET SUC] :Address ATTESO = 0x%px\tAddress EFFETTIVO  = 0x%px\tAddress RETURN = 0x%px\n"
 
 /* Dimensions of the strings to write in the log file after recovering the event data                     */
-int size_no_suc = 92 + 12;
-int size_suc    = 130 + 12;
+extern int size_no_suc ;
+extern int size_suc    ;
 #endif //LOG_SYSTEM
 
 
@@ -85,7 +85,7 @@ int size_suc    = 130 + 12;
 
 typedef void (*do_group_exit_t)(int code);
 
-do_group_exit_t do_group_exit_addr;
+extern do_group_exit_t do_group_exit_addr;
 
 
 
