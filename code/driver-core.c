@@ -1061,7 +1061,7 @@ redo_exit:
     current->pid);
 #endif
 
-    pr_info("%s: [MODULE EXIT] [%d] Il modulo kernel è stato rimosso con successo\n",
+    pr_info("%s: [MODULE EXIT] [%d] The kernel module has been successfully removed\n",
     MOD_NAME,
     current->pid);
 }
