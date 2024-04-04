@@ -929,7 +929,7 @@ int kss_module_init(void) {
 #endif
 
     /* Creation of the node in /proc */
-    my_proc_dir_entry = proc_create("tesi_node", 0666, NULL, &proc_fops);
+    my_proc_dir_entry = proc_create("kss_node", 0666, NULL, &proc_fops);
 
     if(!my_proc_dir_entry) {
         pr_err("%s: [ERROR MODULE INIT] [%d] Failed attempt to create a new knot in /proc\n", MOD_NAME, current->pid);
@@ -941,7 +941,7 @@ int kss_module_init(void) {
     }
 
 #ifdef INFO_DEBUG
-    pr_info("%s: [MODULE INIT] [%d] The new knot /proc/%s it was successfully created\n", MOD_NAME, current->pid, "tesi_node");
+    pr_info("%s: [MODULE INIT] [%d] The new knot /proc/%s it was successfully created\n", MOD_NAME, current->pid, "kss_node");
 #endif
 
     return 0;
@@ -1000,7 +1000,7 @@ void kss_module_exit(void) {
     pr_info("%s: [MODULE EXIT] [%d] The knot /proc/%s it was successfully removed\n",
              MOD_NAME,
              current->pid,
-             "tesi_node");
+             "kss_node");
 
     /*I await that all the threads that have already been launched by the Loader Elf of architecture end their execution*/
 
