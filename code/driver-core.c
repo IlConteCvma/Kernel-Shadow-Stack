@@ -1053,6 +1053,7 @@ redo_exit:
 
 #ifdef LOG_SYSTEM
     /* Delete the world by reporting pending events on log files */
+    flush_workqueue(wq);
     destroy_workqueue(wq);
 
     pr_info("%s: [MODULE EXIT] [%d] Workqueue was successfully removed\n",
