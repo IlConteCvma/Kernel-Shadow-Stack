@@ -474,7 +474,7 @@ int handler_kernel_clone(struct kprobe *p, struct pt_regs *regs) {
 }
 
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,0,0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0)
 /**
  * get_kallsyms_lookup_name - Recovers the memory address of the Kallsyms_lookup_name () function.
  * This function is invoked if Kallsyms_lookup_Name () is not exported to the current version

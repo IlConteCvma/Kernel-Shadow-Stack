@@ -12,7 +12,7 @@
 #define kernel_clone_func            "kernel_clone"
 
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,0,0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0)
 
 /*
  * Kernel Probe to obtain the address of the Kallsyms_lookup_Name () function.

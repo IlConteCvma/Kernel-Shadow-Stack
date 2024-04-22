@@ -751,7 +751,7 @@ int kss_module_init(void) {
     unsigned long asm_exc_invalid_op_addr;                                                                  /* ASM Handler #6 corretto                         */
     unsigned long exc_invalid_op_addr;                                                                      /* C Handler   #6 corretto                         */
     unsigned long addr_invalid_op_first_handler;                                                            /* ASM Handler #6 effettivo                        */
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,0,0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0)
     kallsyms_lookup_name_t kallsyms_lookup_name;                                                            /* Address of the function kallsyms_lookup_name() */
 #endif
 
@@ -766,7 +766,7 @@ int kss_module_init(void) {
     pr_info("%s: [MODULE INIT] [%d] The address of the table IDT is  %px\n",MOD_NAME, current->pid, (void *)idt);
 #endif
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,0,0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0)
     /* Recovery the memory address of the Kallsyms_lookup_name () function */
     kallsyms_lookup_name = get_kallsyms_lookup_name();
 
