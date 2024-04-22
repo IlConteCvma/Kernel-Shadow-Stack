@@ -1323,23 +1323,28 @@ int install_kprobes(void) {
         current->pid);
         return 0;
     }
-
+    
+    #if LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0)
     ret = register_kprobe(&kp_finish_task_switch_cold);
 
     if(ret < 0) {
         unregister_kprobe(&kp_finish_task_switch);
-        pr_err("%s: [ERROR MODULE INIT] [INSTALLATION KPROBE] [%d] Error in the recording of the KPROBE #2 on 'finish_task_switch()'\n",
+        pr_err("%s: [ERROR MODULE INIT] [INSTALLATION KPROBE] [%d] Error in the recording of the KPROBE #2 on 'finish_task_switch()' %d \n",
         MOD_NAME,
-        current->pid);
+        current->pid,
+        ret);
         return 0;
     }
-
+    #endif
+    
     /* Install the KPROBE on the do_exit()                 */
     ret = register_kprobe(&kp_do_exit);
 
     if(ret < 0) {
         unregister_kprobe(&kp_finish_task_switch);
+        #if LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0)
         unregister_kprobe(&kp_finish_task_switch_cold);
+        #endif
         pr_err("%s: [ERROR MODULE INIT] [INSTALLATION KPROBE] [%d] Error in the recording of the KPROBE on the 'do_exit()'\n",
         MOD_NAME,
         current->pid);
@@ -1351,7 +1356,9 @@ int install_kprobes(void) {
 
     if(ret < 0) {
         unregister_kprobe(&kp_finish_task_switch);
+        #if LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0)
         unregister_kprobe(&kp_finish_task_switch_cold);
+        #endif
         unregister_kprobe(&kp_do_exit);
         pr_err("%s: [ERROR MODULE INIT] [INSTALLATION KPROBE] [%d] Error in the recording of the KPROBE on the 'kernel_clone()'\n",
         MOD_NAME,

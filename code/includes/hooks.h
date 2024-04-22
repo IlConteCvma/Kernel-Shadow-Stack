@@ -81,10 +81,12 @@ static struct kprobe kp_finish_task_switch = {
     .symbol_name = finish_task_switch_func,
     .pre_handler = handler_finish_task_switch
 };
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0)
 static struct kprobe kp_finish_task_switch_cold = {
     .symbol_name = finish_task_switch_cold_func,
     .pre_handler = handler_finish_task_switch
 };
+#endif
 
 /*
  * Kernel Probe to intercept the execution of the Do_exit () function.In the

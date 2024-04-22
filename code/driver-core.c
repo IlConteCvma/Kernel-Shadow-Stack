@@ -954,7 +954,9 @@ error_log:
 error_kprobe:
     unregister_kprobe(&kp_kernel_clone);
     unregister_kprobe(&kp_finish_task_switch);
+    #if LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0)
     unregister_kprobe(&kp_finish_task_switch_cold);
+    #endif
     unregister_kprobe(&kp_do_exit);
 
 error_idt_2:
@@ -1044,7 +1046,9 @@ redo_exit:
     /* I remove the recordings of the KPROBE */
     unregister_kprobe(&kp_kernel_clone);
     unregister_kprobe(&kp_finish_task_switch);
+    #if LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0)
     unregister_kprobe(&kp_finish_task_switch_cold);
+    #endif
     unregister_kprobe(&kp_do_exit);
 
     pr_info("%s: [MODULE EXIT] [%d] The proe kernels were successfully removed\n",
