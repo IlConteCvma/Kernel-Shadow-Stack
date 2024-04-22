@@ -19,7 +19,7 @@
 #include <libgen.h>
 #include <time.h>
 
-/* Include per l'utilizzo del nodo in /proc/ */
+/* Includes for the use of the nodo in /proc/ */
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -28,12 +28,12 @@
 
 
 /**
- * info_seg - Mantiene le informazioni per un singolo segmento dell'eseguibile ELF.
+ * info_seg - Keeps information for a single segment of the ELF executable.
  *
- * @dest: Base del segmento di memoria
- * @size: Dimensione del segmento di memoria
- * @prot: Protezioni del segmento di memoria definite nell'eseguibile ELF
- * @next: Puntatore all'elemento successivo nella lista
+ * @Dest: base of the memory segment
+ * @size: size of the memory segment
+ * @prot: Protections of the memory segment defined in the ELF executable
+ * @next: pointer to the next element in the list
  */
 typedef struct info_seg {
     ElfW(Addr) dest;
@@ -42,20 +42,20 @@ typedef struct info_seg {
     struct info_seg *next;
 } info_seg;
 
-/* Puntatore alla testa della lista contenente le informazioni sui segmenti dell'eseguibile */
+/* List of the list of the list containing the information on the segments of the executable */
 info_seg * info_seg_head = NULL;
 
 /*
- * instrum_param - Contiene i parametri che devono essere utilizzati per eseguire l'instrumentazione del programma.
+ * instrum_param - Contains the parameters that must be used to perform the teenage of the program.
  *
- * @data           : Base della Memory View del file ELF
- * @new_mapp_area  : Base della nuova area di memoria mappata contenente le informazioni per simulare le CALL
- * @et_dyn         : Tipologia del file ELF (ET_DYN oppure ET_EXEC)
- * @num_istr_call  : Numero di CALL da instrumentare
- * @num_istr_ret   : Numero di RET da instrumentare
- * @path_instr_info: Percorso della directory contenente le informazioni di instrumentazione
- * @input_file     : Percorso assoluto del nuovo file da caricare
- * @id_user        : Identificativo numerico utente utilizzato per creare i file di LOG
+ * @data: base of the Memory View of the Elf file
+ * @new_mapp_aarea: base of the new map of the mapped memory containing the information to simulate the calls
+ * @et_dyn: type of the ELF file (ET_DYN or ET_EXEC)
+ * @num_istr_call: number of calls to be made up
+ * @num_istr_ret: Ret number to be made up
+ * @path_instr_info: director of the directory containing the instrument information
+ * @input_file: absolute path of the new file to be loaded
+ * @id_user: User -numerical identification used to create log files
  */
 typedef struct instrum_param {
     unsigned char * data;
@@ -78,31 +78,31 @@ typedef struct instrum_param {
 } instrum_param;
 
 
-/* Un pò di stringhe utili per la costruzione dei percorsi assoluti nel recupero delle informazioni di instrumentazione */
+/* A little useful strings for the construction of the absolute paths in the recovery of instrument information*/
 const char *file_path_number_suf_call = "call/number.txt";
 const char *file_path_number_suf_ret = "ret/number.txt";
 const char *dir_path_call_suf = "call/";
 const char *dir_path_ret_suf = "ret/";
 
-/* Percorso assoluto del file contenente il numero di CALL da instrumentare */
+/* Absolute path of the file containing the number of calls to be made up*/
 char file_path_number_call[256] = {0};
 
-/* Percorso assoluto del file contenente il numero di RET da instrumentare */
+/* Absolute route of the file containing the number of Ret to be made up */
 char file_path_number_ret[256] = {0};
 
-/* Percorso assoluto della directory contenente le informazioni di instrumentazione per le CALL */
+/* Absolute path of the directory containing the instrumentation information for the CALL */
 char dir_path_call[256] = {0};
 
-/* Percorso assoluto della directory contenente le informazioni di instrumentazione per le RET */
+/*Absolute path of the directory containing the instrumentation information for the RET */
 char dir_path_ret[256] = {0};
 
 /*
- * instru_call_info - Contiene le informazioni che dovranno essere scritte per ogni istruzione di CALL da
- * instrumentare nella nuova area di memoria. Le informazioni per CALL sono le seguenti:
- * 1. Istruzione INT per lanciare un'interrupt spuria in modo da simulare una CALL.
- * 2. Tre istruzioni di NOP a due byte per allineare lo stack.
- * 3. Indirizzo assoluto della funzione target a cui il Kernel passerà il controllo.
- * 4. Return Address da posizionare sia sul nuovo stack kernel che su quello user.
+ * instru_call_info - Contains the information that must be written for each call education from
+ * Instrument in the new memory area.Call information is as follows:
+ * 1. INDUCATION INDERS TO CAKE AN SPURE SCURPT in order to simulate a call.
+ * 2. Three two -byte Nop instructions to align the stack.
+ * 3. Absolute address of the target function to which the kernel will pass control.
+ * 4. Return Address to be placed both on the new Kernel Stack and on the user.
  */
 struct instru_call_info {
     unsigned char byte1;
@@ -119,10 +119,10 @@ struct instru_call_info {
 
 #ifdef RANDOM_SUBSET_FUNC
 /**
- * random_index - Indice numerico generato randomicamente di una funzione da instrumentare.
+ * random_index - Numerical index generated randomly of a function to be made.
  *
- * @idx : Indice numerico della funzione
- * @next: Puntatore all'indice successivo nella lista collegata
+ * @idx: numerical index of the function
+ * @next: pointer to the next index on the connected list
  */
 typedef struct random_index {
     unsigned long idx;
@@ -131,13 +131,13 @@ typedef struct random_index {
 #endif //RANDOM_SUBSET_FUNC
 
 /**
- * do_instrumentation - Esegue l'instrumentazione delle istruzioni di CALL e di RET presenti nel programma
- * caricato dal Loader ELF. Eventualmente, comunica al Kernel Linux la mappa di instrumentazione per la
- * corrente istanza del Loader ELF, crea il file contenente gli estremi della zona di memoria instrumentata
- * e comunica le informazioni di monitoraggio per permetterrle al Kernel Linux di identificare correttamente
- * gli offset delle istruzioni e delle funzioni nell'eseguibile e per creare i file di LOG.
+ * do_instrumentation -Performs the institution of the call and ret instructions in the program
+ * loaded by the Loader Elf.Possibly, communicate to the Linux kernel the instrument map for the
+ * Loader Elf's current request, creates the file containing the details of the instruated memory area
+ * and communicate the monitoring information to allow it to the Linux kernel to identify correctly
+ * The offset of instructions and functions in the executable and to create log files.
  *
- * @param: Puntatore alle informazioni necessarie per eseguire l'instrumentazione.
+ * @param: pointer to the information necessary to perform the instrumentation.
  */
 void do_instrumentation(instrum_param* param) {
     int operand;
@@ -154,19 +154,19 @@ void do_instrumentation(instrum_param* param) {
     int is_in;
     int id_func;
     char func_name[256];
-    int fd;                                     /* File Descriptor del nodo in /proc                                           */
-    const char *node = "/proc/tesi_node";       /* Percorso del nodo in /proc per comunicare al kernel le attività da eseguire */
+    int fd;                                     /* fileDescriptorDelNodoIn /proc                                           */
+    const char *node = "/proc/kss_node";       /* Path of the node in /proc to communicate the activities to be performed at the kernel*/
 #ifdef LOG_SYSTEM
     char *last_occ;
     log_system_info lsi;
 #endif
 #ifdef IOCTL_INSTRUM_MAP
-    struct ioctl_data *my_ioctl_data;           /* Mappa di instrumentazione user space                                        */
-    unsigned long start_text;                   /* Inizio della sezione .text                                                  */
-    unsigned long end_text;                     /* Fine della sezione .text                                                    */
+    struct ioctl_data *my_ioctl_data;           /* User Space Instruments Map                                       */
+    unsigned long start_text;                   /* Beginning of the section .text                                                  */
+    unsigned long end_text;                     /* End of the section .text                                                    */
 #endif
 #ifdef RANDOM_SUBSET_FUNC
-    /* Puntatore al pimo elemento della lista contenente gli indici delle funzioni da instrumentare generati randomicamente. */
+    /* Pointer at the first element of the list containing the indexes of the functions to be made up randomly generated. */
     random_index *random_idx_list_head = NULL;
     random_index *curr_random_idx = NULL;
     random_index *prev = NULL;
@@ -182,7 +182,7 @@ void do_instrumentation(instrum_param* param) {
     int count_error;
 #endif
 #ifndef WITH_IN
-    /* Se non sono ammessi scenari di tipo IN è necessario mantenere il conto delle funzioni che non li generano */
+    /* If non -type in type scenarios must be maintained the functions of the functions that do not generate them*/
     int counter_no_is_in_func = 0;
     int last_id_func=-1;
 #endif
@@ -192,61 +192,61 @@ void do_instrumentation(instrum_param* param) {
 #ifdef RANDOM_SUBSET_FUNC
 
     /*
-     * Indipendentemente dal fatto se si considerano o meno gli scenari di tipo IN, voglio instrumentare solamente un
-     * sottoinsieme delle funzioni considerate. Quindi, verrà preso un sottoinsieme tra TUTTE le funzioni 'buone'
-     * oppure solamente tra quelle che non generano scenari di tipo IN.
-     * Si inizia con il calcolare il numero totale delle funzioni che possiamo considerare, a seconda se consideriamo
-     * o meno anche quelle che generano scenari di tipo IN. Successivamente verranno generati randomicamente degli
-     * indici numerici che corrisponderanno agli identificativi delle funzioni da instrumentare. Tutto ciò è possibile
-     * poiché Ghidra ha assegnato alle funzioni un identificativo numerico.
+     * Regardless of whether or not you consider the type in type scenarios, I want to instruct only one
+     * subset of the functions considered.Therefore, a subset will be taken among all the 'good' functions
+     * or only among those that do not generate type in.
+     * We start by calculating the total number of functions that we can consider, depending on whether we consider
+     * or not also those that generate type in.Subsequently randomly will be generated
+     * Numerical indices that will correspond to the identification of the functions to be made.All this is possible
+     * Since Ghidra has assigned a numerical identification to the functions.
      */
 
-    /* Costruisco il nome del file contenente il numero delle funzioni di interesse */
+    /*I build the name of the file containing the number of functions of interest */
     strcpy(filename_instr, param->path_instr_info);
 
 #ifdef WITH_IN
 
-    /* Consideriamo TUTTE le funzioni 'buone', anche quelle che potrebbero portare a degli scenari di tipo IN */
+    /*We consider all the 'good' functions, even those that could lead to type scenarios in*/
     strcpy(filename_instr + strlen(filename_instr), "/num_good_func.txt");
 
 #else
 
-    /* Consideriamo solamente quelle funzioni 'buone' che non portano a scenari di tipo IN */
+    /*We consider only those 'good' functions that do not lead to type scenarios in */
     strcpy(filename_instr + strlen(filename_instr), "/num_good_func_no_is_in.txt");
 
 #endif //WITH_IN
 
-    /* Lettura del numero delle funzioni che consideriamo per la corrente compilazione del Loader ELF */
+    /* Reading of the number of functions that we consider for the current compilation of the Loader Elf*/
 
     file = fopen(filename_instr, "r");
 
     if(file == NULL) {
-        perror("[ERRORE INSTRUMENTAZIONE] [ERRORE GET FUNC SIZE] Errore apertura del file contenente il numero delle funzioni da considerare");
+        perror("[Instruments error] [ERRORE GET FUNC SIZE] File opening error containing the number of functions to consider");
         exit(EXIT_FAILURE);
     }
 
     if(fscanf(file, "%d", &num_func) != 1) {
-        printf("[ERRORE INSTRUMENTAZIONE] [ERRORE GET FUNC SIZE] Errore nella lettura del numero di funzioni da considerare\n");
+        printf("[Instruments error] [ERRORE GET FUNC SIZE] Error in reading the number of functions to consider\n");
         exit(EXIT_FAILURE);
     }
 
-    /* Verifico se Ghidra non ha trovato alcuna funzione che può essere instrumentata */
+    /* I check if Ghidra has not found any function that can be instructed */
     if(num_func == 0) {
-        printf("[WARNING INSTRUMENTAZIONE] Ghidra non ha trovato alcuna funzione da instrumentare\n");
+        printf("[WARNING Instrumentation] Ghidra has not found any function to be made up\n");
         goto no_rand;
     }
 
     /*
-     * Una volta calcolato il numero delle funzioni tra cui effettuare la scelta randomica, è possibile determinare
-     * un valore intero che rappresenterà il numero delle funzioni che andremo ad instrumentare. Questa valore intero
-     * potrà essere generato in modo randomico oppure utilizzando la percentuale passata al loader ELF tramite riga di
-     * comando. Successivamente, verranno generati gli identificativi numerici delle funzioni da instrumentare.
+     * Once the number of functions is calculated, including the random choice, it is possible to determine
+     * An integer value that will represent the number of functions that we will instruct.This whole value
+     * can be generated in a random way or using the percentage passed to the Loader Elf via a line of
+     * command.Subsequently, the numerical identifiers of the functions to be made will be generated.
      */
 
 #ifdef RAND_PERC
     rand_subset_dim = (num_func * param->perc) / 100;
 
-    /* Gestisco un eventuale caso in cui il valore finale è approsimato per difetto a zero */
+    /* I manage any case in which the final value is approved by lack of zero */
     if(rand_subset_dim == 0 && num_func > 0) {
         rand_subset_dim = 1;
     }
@@ -257,13 +257,13 @@ void do_instrumentation(instrum_param* param) {
 
 redo_random_number:
 
-    /* Randomizzo la scelta del seme in modo da avere un numero differente di funzioni nelle varie esecuzioni */
+    /* Randomize the choice of the seed in order to have a different number of functions in the various executions*/
     seed = time(NULL);
 
-    /* Imposto il seme generato in modo 'randomico' */
+    /* Imposed the seed generated in a 'random' way */
     srand(seed);
 
-    /* Genero casualmente il numero delle funzioni che verranno instrumentate dal Loader ELF */
+    /* Road randomly the number of functions that will be instructed by the Loader Elf */
     rand_subset_dim = rand() % num_func;
 
     if(rand_subset_dim == 0){
@@ -279,63 +279,63 @@ out:
 #endif //RAND_PERC
 
 #ifdef DEBUG_RAND_FUNC
-    printf("[INSTRUMENTAZIONE] Il numero delle funzioni che verranno considerate è %d\n", rand_subset_dim);
+    printf("[Instrumentation] The number of functions that will be considered is %d\n", rand_subset_dim);
 #endif
 
-    /* Alloco l'array che verrà utilizzato per determinare se un indice numerico è stato già generato */
+    /* Alloco the array that will be used to determine if a numerical index has already been generated */
     idx_used = (int *)malloc(sizeof(int) * rand_subset_dim);
 
     if(idx_used == NULL) {
-        perror("[ERRORE INSTRUMENTAZIONE] Errore nell'allocazione dell'array mantenente gli indici numerici che sono stati generati:");
+        perror("[error Instrumentation] ARRAGE ERROR OF ARRAY maintaining the numerical indices that have been generated:");
         exit(EXIT_FAILURE);
     }
 
-    /* Il valore -1 indicherà che la posizione dell'array è libera per scriverci un nuovo elemento */
+    /* The value -1 will indicate that the position of the array is free to write a new element */
     for(int i = 0; i < rand_subset_dim; i++) {
         idx_used[i] = -1;
     }
 
 #ifdef DEBUG_RAND_FUNC
-    printf("[INSTRUMENTAZIONE] Numero delle funzioni disponibili: %d\tNumero delle funzioni da instrumentare: %d\n", num_func, rand_subset_dim);
+    printf("[Instrumentation] Number of functions available:%d\tNumber of functions to be made:%d\n", num_func, rand_subset_dim);
 #endif
 
     /*
-     * L'array 'idx_used' viene utilizzato per memorizzare gli identificativi numerici randomici che 
-     * sono stati già generati. Inoltre, questo indice rappresenta la posizione nell'array 'idx_used
-     * in cui scrivere il prossimo identificativo numerico per tenerne traccia nelle generazioni a
-     * seguire. E' importante tenerne traccia per evitare di considerare una stessa funzione nella
-     * instrumentazione del programma da lanciare.
+     * The an array 'Idx_used' is used to memorize random identifiers that
+     * have already been generated.In addition, this index represents the position in the Array 'IDX_USED
+     * in which to write the next numerical identification to keep track of it in the generations a
+     * follow.It is important to keep track of this to avoid considering the same function in the
+     * Instrumentation of the program to be launched.
      */
 
      curr_idx_used = 0;
 
-    /* Randomizzo la scelta del seme in modo da avere un numero differente di funzioni nelle varie esecuzioni */
+    /* Randomize the choice of the seed in order to have a different number of functions in the various executions */
     seed = time(NULL);
 
-    /* Imposto il seme generato in modo 'randomico' */
+    /*Imposed the seed generated in a 'random' way */
     srand(seed);
 
      for(int i=0; i < rand_subset_dim; i++) {
 
 #ifdef DEBUG_RAND_FUNC
-        printf("[INSTRUMENTAZIONE] Generazione dell'identificativo randomico numerico #%d/%d...\n", i + 1, rand_subset_dim);
+        printf("[Instrumentation] Generation of the numerical random identification #%d/%d...\n", i + 1, rand_subset_dim);
 #endif
 
 redo:
-        /* Genero casualmente un nuovo identificativo numerico di funzione */
+        /* Road randomly a new numerical function identification */
         new_rand_idx = rand() % num_func;
 
 #ifdef DEBUG_RAND_FUNC
-        printf("[INSTRUMENTAZIONE] Identificativo randomico numerico generato :%d...\n", new_rand_idx);
+        printf("[Instrumentation]Numeric random identification generated:%d...\n", new_rand_idx);
 #endif
 
-        /* Questa etichetta consente di verificare se l'identificativo è stato già generato */
+        /* This label allows you to check if the identification has already been generated*/
         is_used = false;
 
         for(int j=0; j < rand_subset_dim; j++) {
 
             if(idx_used[j] == -1) {
-                /* Ho visto tutti gli identificativi che sono stati generati */
+                /* I saw all the identifiers that have been generated */
                 break;
             } else {
                 if(idx_used[j] == new_rand_idx) {
@@ -348,42 +348,38 @@ redo:
         if(is_used) goto redo;
 
 #ifdef DEBUG_RAND_FUNC
-        printf("[INSTRUMENTAZIONE] Identificativo numerico randomico #%d: %d\n", i + 1, new_rand_idx);
+        printf("[Instrumentation] Randomic numerical identification #%d: %d\n", i + 1, new_rand_idx);
 #endif
 
-        /* Registro l'identificativo numerico della funzione che è stato generato */
+        /* Register the numerical identification of the function that has been generated */
         idx_used[curr_idx_used] = new_rand_idx;
 
         curr_idx_used++;
 
         /*
-         * Alloco e inizializzo il nuovo elemento da inserire nella lista degli identificativi. Gli identificativi
-         * devono essere inseriti rispettando un ordine (strettamente) crescente poiché successivamente si itererà
-         * sugli offset delle CALL/RET una sola volta. Gli identificativi inseriti nella lista corrispondono a quelli
-         * presenti nelle righe dei file di instrumentazione contenenti gli offset che sono stati creati da Ghidra.
-         */
+         * allocoAndInitialTheNewElementToBeIncludedInTheListOfIdentificationIdentification *MustBeInsertedByRespectingAnOrder (strictly)GrowingAsItWillLaterProcessIt *OnTheOffsetOfTheCalls/retnOneTimeIdentificationIncludedInTheListCorrespondToThose *PresentInTheLinesOfTheInstructionFilesContainingTheOffsetsThatWereCreatedByGhidra. */
 
         new_item = (random_index *)malloc(sizeof(random_index));
 
         if(new_item == NULL) {
-            perror("[ERRORE INSTRUMENTAZIONE] Errore allocazione memoria per indice di funzione randomico:");
+            perror("[Instruments error] Railing Memory Allocation error for randomic function:");
             exit(EXIT_FAILURE);
         }
 
         new_item->idx = new_rand_idx;
         new_item->next = NULL;
 
-        /* Inserimento rispettando un ordine strettamente crescente all'interno della lista collegata */
+        /* Insertion respecting a strictly growing order within the connected list */
 
         if((random_idx_list_head == NULL) || (new_item->idx < random_idx_list_head->idx))  {
 
-            /* Inserimento del nuovo elemento in testa alla lista */
+            /* Inserting the new element at the top of the list */
             new_item->next = random_idx_list_head;
             random_idx_list_head = new_item;
 
         } else {
                 
-            /* Ricerco la posizione corretta all'interno della lista collegata */
+            /* I refrain the correct position within the connected list */
             prev = random_idx_list_head;
             curr_random_idx = random_idx_list_head->next;
 
@@ -400,7 +396,7 @@ redo:
 #ifdef DEBUG_RAND_FUNC
     curr_random_idx = random_idx_list_head;
 
-    printf("Stampa della lista contenente gli identificativi randomici che sono stati generati:\n");
+    printf("Printing of the list containing the random identifiers that have been generated:\n");
 
     while(curr_random_idx != NULL) {
         printf("%ld\n", curr_random_idx->idx);
@@ -414,61 +410,61 @@ no_rand:
 
 
 #ifdef IOCTL_INSTRUM_MAP
-    /* Costruisco il nome del file contenente il range della zona di memoria instrumentata */
+    /* I build the name of the file containing the range of the instruated memory area*/
     memset(filename_instr, 0, 256);
     strcpy(filename_instr, param->path_instr_info);
     strcpy(filename_instr + strlen(filename_instr), "/zone.txt");
 
-    /* Apertura del file */
+    /*File opening*/
     file = fopen(filename_instr, "r");
 
     if(file == NULL) {
-        perror("[ERRORE INSTRUMENTAZIONE] [ZONE] Errore apertura del file contenente gli estremi della zona instrumentata");
+        perror("[Instruments error] [ZONE] File opening error containing the extremes of the instruated area");
         exit(EXIT_FAILURE);
     }
 
-    /* Lettura degli estremi della zona di instrumentazione */
+    /*Reading of the extremes of the instrument area */
     if(fscanf(file, "%lx", &start_text) != 1) {
-        printf("[ERRORE INSTRUMENTAZIONE] [ZONE] Errore nella lettura dell'estremo iniziale della zona instrumentata\n");
+        printf("[Instruments error] [ZONE] Reading error of the initial extreme of the instrumental area\n");
         exit(EXIT_FAILURE);
     }
 
     if(fscanf(file, "%lx", &end_text) != 1) {
-        printf("[ERRORE INSTRUMENTAZIONE] [ZONE] Errore nella lettura dell'estremo finale della zona instrumentata\n");
+        printf("[Instruments error] [ZONE] Reading error of the final extreme of the instruated area\n");
         exit(EXIT_FAILURE);
     }
 
 #ifdef DEBUG_INSTR
-    printf("[INSTRUMENTAZIONE] [ZONE] Estremi della zona instrumentata [%lx, %lx]\n", start_text, end_text);
+    printf("[Instrumentation] [ZONE] Extremes of the instrumental area [%lx, %lx]\n", start_text, end_text);
 #endif
 
-    /* Alloco ed inizializzo la struttura dati contenente la mappa di instrumentazione da passare al Kernel Linux */
+    /* Alloco and initials the data structure containing the instrument map to go to the Linux kernel*/
     my_ioctl_data = (struct ioctl_data *)malloc(sizeof(struct ioctl_data));
 
     if(my_ioctl_data == NULL) {
-        perror("[ERRORE INSTRUMENTAZIONE] Errore allocazione memoria per la mappa di instrumentazione");
+        perror("[Instruments error] Memory allocation error for the instrument map");
         exit(EXIT_FAILURE);
     }
 
-    /* Setto l'inizio della zona di memoria instrumentata tenendo conto della base del mapping */
+    /* Septum the beginning of the instrumental memory area taking into account the base of the mapping */
     my_ioctl_data->start_text = start_text + (unsigned long)(param->data);
 
-    /* Setto la fine della zona di memoria instrumentata tenendo conto della base del mapping */
+    /* Setto the end of the instrumental memory area taking into account the base of the mapping */
     my_ioctl_data->end_text = end_text + (unsigned long)(param->data);
 
-    /* Setto il numero di CALL che verranno instrumentate dal Loader ELF */
+    /* Septum the number of calls that will be instructed by Loader ELF */
     my_ioctl_data->call_num  = param->num_istr_call;
 
     if(param->num_istr_call == 0) {
 #ifdef DEBUG_INSTR
-        printf("[INSTRUMENTAZIONE] Non ci sono CALL da instrumentare\n");
+        printf("[Instrumentation] There are no calls to instruct\n");
 #endif
         my_ioctl_data->call_array = NULL;
     } else {
         my_ioctl_data->call_array = (unsigned long *)calloc(my_ioctl_data->call_num, sizeof(unsigned long));
 
         if((my_ioctl_data->call_array) == NULL) {
-            perror("[ERRORE INSTRUMENTAZIONE] Errore allocazione dell'array di indirizzi di memoria delle istruzioni INT 0xFF");
+            perror("[Instruments error] Error allocation of array of instructions memory addressesINT 0xFF");
             exit(EXIT_FAILURE);
         }
     }
