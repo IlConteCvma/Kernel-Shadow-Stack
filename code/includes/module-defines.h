@@ -9,13 +9,13 @@
 #define DEBUG_INVALID_OP            //
 #define DEBUG_SPURIOUS              //
 #define INFO_DEBUG                  //
+
 #define IOCTL_INSTRUM_MAP           // 
 #define LOG_SYSTEM                  //
-#define MIX_ADDRESS                 //
 #define SHOW_STACK_KERNEL           //
-#define CHECK_BUFFER_SIZE           //
+//#define CHECK_BUFFER_SIZE           //
 
-#define KILL_PROCESS_NO_CALL        //kill process if no call event
+//#define KILL_PROCESS_NO_CALL        //kill process if no call event
 
 
 // address control
@@ -25,9 +25,9 @@
 #define MIX_ADDRESS
 
 //timer
-#define SINGLE_ADDRESS_TIMER        //
-#define TIMER_COMPARE_RET_ADDR      //
-#define BLOCK_ADDRESS_TIMER         //
+//#define SINGLE_ADDRESS_TIMER        //
+//#define TIMER_COMPARE_RET_ADDR      //
+//#define BLOCK_ADDRESS_TIMER         //
 
 /*--------------------------------*/
 
