@@ -474,7 +474,7 @@ int handler_kernel_clone(struct kprobe *p, struct pt_regs *regs) {
 }
 
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,0,0)
 /**
  * get_kallsyms_lookup_name - Recovers the memory address of the Kallsyms_lookup_name () function.
  * This function is invoked if Kallsyms_lookup_Name () is not exported to the current version
@@ -1324,7 +1324,7 @@ int install_kprobes(void) {
         return 0;
     }
     
-    #if LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0)
+    #if LINUX_VERSION_CODE >= KERNEL_VERSION(6,0,0)
     ret = register_kprobe(&kp_finish_task_switch_cold);
 
     if(ret < 0) {
@@ -1342,7 +1342,7 @@ int install_kprobes(void) {
 
     if(ret < 0) {
         unregister_kprobe(&kp_finish_task_switch);
-        #if LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0)
+        #if LINUX_VERSION_CODE >= KERNEL_VERSION(6,0,0)
         unregister_kprobe(&kp_finish_task_switch_cold);
         #endif
         pr_err("%s: [ERROR MODULE INIT] [INSTALLATION KPROBE] [%d] Error in the recording of the KPROBE on the 'do_exit()'\n",
@@ -1356,7 +1356,7 @@ int install_kprobes(void) {
 
     if(ret < 0) {
         unregister_kprobe(&kp_finish_task_switch);
-        #if LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0)
+        #if LINUX_VERSION_CODE >= KERNEL_VERSION(6,0,0)
         unregister_kprobe(&kp_finish_task_switch_cold);
         #endif
         unregister_kprobe(&kp_do_exit);
