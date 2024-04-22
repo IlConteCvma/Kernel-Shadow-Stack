@@ -1,6 +1,7 @@
 #include "includes/logging.h"
 #include "includes/utils.h"
 //#include "includes/module-defines.h"
+#include <linux/slab.h>
 
 #ifdef LOG_SYSTEM
 /* Workqueue name */
