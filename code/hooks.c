@@ -6,6 +6,51 @@
 //#include "includes/kss_struct.h"
 //#include "includes/dirver-core.h"
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0)
+
+/*
+ * Kernel Probe to obtain the address of the Kallsyms_lookup_Name () function.
+ * This function allows you to recover the addresses of events managers
+ * of interest in order to check if the current version of the kernel can
+ * be used.
+ */
+struct kprobe kp_kallsyms_lookup_name = {
+    .symbol_name = kallsyms_lookup_name_func
+};
+#endif
+
+struct kprobe kp_kernel_clone = {
+    .symbol_name = kernel_clone_func,
+    .pre_handler = handler_kernel_clone
+};
+
+/*
+ * Kernel Probe to intercept the allocation of safety metadata.When
+ * new threads will be generated, it occurs if there is a need to allocate
+ * The safety metadata before the request for
+ * simulate calls and ret.
+ */
+struct kprobe kp_finish_task_switch = {
+    .symbol_name = finish_task_switch_func,
+    .pre_handler = handler_finish_task_switch
+};
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,0,0)
+struct kprobe kp_finish_task_switch_cold = {
+    .symbol_name = finish_task_switch_cold_func,
+    .pre_handler = handler_finish_task_switch
+};
+#endif
+
+/*
+ * Kernel Probe to intercept the execution of the Do_exit () function.In the
+ * DO_EXIT () function will be released allocated safety metadata.
+ */
+struct kprobe kp_do_exit = {
+    .symbol_name = do_exit_func,
+    .pre_handler = hook_do_exit
+};
+
 
 /**
  * Handler_finish_task_Switch - allows you to allocate the data structures per -keep if the current thread
@@ -1351,6 +1396,11 @@ int install_kprobes(void) {
         return 0;
     }
 
+    pr_info("%s: [MODULE INFO TEST] [%d] Do exit register pointer %lx\n",
+    MOD_NAME,
+    current->pid,
+    (unsigned long) &kp_do_exit);
+
     /* Install the KPROBE on the kernel_clone()                 */
     ret = register_kprobe(&kp_kernel_clone);
 
@@ -1371,4 +1421,24 @@ int install_kprobes(void) {
     current->pid);
 
     return 1;
+}
+
+void remove_probes(void){
+    unregister_kprobe(&kp_kernel_clone);
+    unregister_kprobe(&kp_finish_task_switch);
+    #if LINUX_VERSION_CODE >= KERNEL_VERSION(6,0,0)
+    unregister_kprobe(&kp_finish_task_switch_cold);
+    #endif
+
+    pr_info("%s: [MODULE INFO TEST] [%d] Do exit UNregister pointer %lx\n",
+    MOD_NAME,
+    current->pid,
+    (unsigned long) &kp_do_exit);
+
+    unregister_kprobe(&kp_do_exit);
+
+    pr_info("%s: [MODULE EXIT] [%d] The prob kernels were successfully removed\n",
+    MOD_NAME,
+    current->pid);
+
 }

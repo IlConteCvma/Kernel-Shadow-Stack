@@ -14,15 +14,6 @@
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0)
 
-/*
- * Kernel Probe to obtain the address of the Kallsyms_lookup_Name () function.
- * This function allows you to recover the addresses of events managers
- * of interest in order to check if the current version of the kernel can
- * be used.
- */
-static struct kprobe kp_kallsyms_lookup_name = {
-    .symbol_name = kallsyms_lookup_name_func
-};
 
 /* I define the signature for the Kallsyms_lookup_name function                  */
 typedef unsigned long (*kallsyms_lookup_name_t)(const char *name);
@@ -63,43 +54,7 @@ extern int patch_IDT(unsigned long address_first_handler, unsigned long address_
         struct desc_ptr dtr, int vector_number, void *handler, struct info_patch *item);
 
 extern int install_kprobes(void);
-
-static struct kprobe kp_kernel_clone = {
-    .symbol_name = kernel_clone_func,
-    .pre_handler = handler_kernel_clone
-};
-
-
-
-/*
- * Kernel Probe to intercept the allocation of safety metadata.When
- * new threads will be generated, it occurs if there is a need to allocate
- * The safety metadata before the request for
- * simulate calls and ret.
- */
-static struct kprobe kp_finish_task_switch = {
-    .symbol_name = finish_task_switch_func,
-    .pre_handler = handler_finish_task_switch
-};
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,0,0)
-static struct kprobe kp_finish_task_switch_cold = {
-    .symbol_name = finish_task_switch_cold_func,
-    .pre_handler = handler_finish_task_switch
-};
-#endif
-
-/*
- * Kernel Probe to intercept the execution of the Do_exit () function.In the
- * DO_EXIT () function will be released allocated safety metadata.
- */
-static struct kprobe kp_do_exit = {
-    .symbol_name = do_exit_func,
-    .pre_handler = hook_do_exit
-};
-
-
-
-
+extern void remove_probes(void);
 
 
 #endif

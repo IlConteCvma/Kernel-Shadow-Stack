@@ -1,5 +1,5 @@
-obj-m := kss-module.o
-kss-module-y :=  driver-core.o logging.o utils.o kss_struct_logic.o ht_logic.o hooks.o
+obj-m := kss_module.o
+kss_module-y :=  driver-core.o logging.o utils.o kss_struct_logic.o ht_logic.o hooks.o
 
 
 KDIR ?= /lib/modules/$(shell uname -r)/build
@@ -17,8 +17,8 @@ clean clear:
 
 
 install:
-	insmod kss-module.ko
+	insmod kss_module.ko
 
 remove:
-	rmmod kss-module
+	rmmod kss_module
 	

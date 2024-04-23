@@ -952,12 +952,7 @@ error_log:
 #endif
 
 error_kprobe:
-    unregister_kprobe(&kp_kernel_clone);
-    unregister_kprobe(&kp_finish_task_switch);
-    #if LINUX_VERSION_CODE >= KERNEL_VERSION(6,0,0)
-    unregister_kprobe(&kp_finish_task_switch_cold);
-    #endif
-    unregister_kprobe(&kp_do_exit);
+    remove_probes();
 
 error_idt_2:
     cr0 = read_cr0();
@@ -1044,16 +1039,7 @@ redo_exit:
 	protect_memory();
 
     /* I remove the recordings of the KPROBE */
-    unregister_kprobe(&kp_kernel_clone);
-    unregister_kprobe(&kp_finish_task_switch);
-    #if LINUX_VERSION_CODE >= KERNEL_VERSION(6,0,0)
-    unregister_kprobe(&kp_finish_task_switch_cold);
-    #endif
-    unregister_kprobe(&kp_do_exit);
-
-    pr_info("%s: [MODULE EXIT] [%d] The proe kernels were successfully removed\n",
-    MOD_NAME,
-    current->pid);
+   remove_probes();
 
 #ifdef LOG_SYSTEM
     /* Delete the world by reporting pending events on log files */
@@ -1068,6 +1054,8 @@ redo_exit:
     pr_info("%s: [MODULE EXIT] [%d] The kernel module has been successfully removed\n",
     MOD_NAME,
     current->pid);
+
+    
 }
 
 module_init(kss_module_init);

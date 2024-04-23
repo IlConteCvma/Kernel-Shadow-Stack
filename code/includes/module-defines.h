@@ -3,14 +3,15 @@
 
 /* configuration defines ---------*/
 #define DEBUG_HOOK                  //show debug msg
-#define DEBUG_IOCTL_FUNC            //show debug msg for ioctl
-#define DEBUG_CHECK_RETURN_ADDRESS  //
-#define DEBUG_PERFORMANCE_WEAK      //
-#define DEBUG_INVALID_OP            //
-#define DEBUG_SPURIOUS              //
+//#define DEBUG_IOCTL_FUNC            //show debug msg for ioctl
+//#define DEBUG_CHECK_RETURN_ADDRESS  //
+//#define DEBUG_PERFORMANCE_WEAK      //
+//#define DEBUG_INVALID_OP            //
+//#define DEBUG_SPURIOUS              //
+//#define DEBUG_REGISTRAZIONE_EVENTO
 #define INFO_DEBUG                  //
 
-#define IOCTL_INSTRUM_MAP           // 
+//#define IOCTL_INSTRUM_MAP           // 
 #define LOG_SYSTEM                  //
 #define SHOW_STACK_KERNEL           //
 //#define CHECK_BUFFER_SIZE           //
@@ -29,7 +30,7 @@
 //#define TIMER_COMPARE_RET_ADDR      //
 //#define BLOCK_ADDRESS_TIMER         //
 
-/*--------------------------------*/
+/*--------------------------------------------------------------------------------------------------------------------*/
 
 
 /* Name of the kernel module                                                                                              */
