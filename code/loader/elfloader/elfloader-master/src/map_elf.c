@@ -449,7 +449,7 @@ no_rand:
     /* Septum the beginning of the instrumental memory area taking into account the base of the mapping */
     my_ioctl_data->start_text = start_text + (unsigned long)(param->data);
 
-    /* Setto the end of the instrumental memory area taking into account the base of the mapping */
+    /* Set  the end of the instrumental memory area taking into account the base of the mapping */
     my_ioctl_data->end_text = end_text + (unsigned long)(param->data);
 
     /* Septum the number of calls that will be instructed by Loader ELF */
