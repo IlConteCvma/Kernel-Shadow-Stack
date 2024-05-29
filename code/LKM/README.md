@@ -19,6 +19,9 @@ La funzione check_all_return_adress gestisce:
     - MIX_ADDRESS
 
 //define da inserire : 
+    - KILL_PROCESS_NO_CALL
+    - KILL_PROCESS
+    - 
     - LOG_SYSTEM
     - GESTIONE INDIRIZZI:
         - MIX_ADDRESS

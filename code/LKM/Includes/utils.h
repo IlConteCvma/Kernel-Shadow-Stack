@@ -13,6 +13,10 @@
 #define DEBUG
 #endif
 
+#ifdef DEBUG_HOOK
+#define DEBUG
+#endif
+
 
 #define DEBUG //TODO remove
 //TODO change includes !!
@@ -44,11 +48,18 @@
 #define dprint_info_log(...)
 #endif
 
+#ifdef DEBUG_HOOK
+#define dprint_info_hook(...) (pr_info(__VA_ARGS__))
+#else
+#define dprint_info_hook(...)
+#endif
+
 #else
 #define dprint_info(...)
 #define dprint_info_test(...)
 #define dprint_info_v(...) 
 #define dprint_info_log(...)
+#define dprint_info_hook(...)
 #endif
 
 #endif
