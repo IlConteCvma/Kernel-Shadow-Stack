@@ -9,7 +9,7 @@ per debbug (vedi utils.h):
     - DEBUG_TEST
 
 capire cosa fare con:
-    - MIX_ADDRESS (IN single address)
+    - MIX_ADDRESS (IN single address), anche nel driver-core.c funzione ioctl
     - CHECK_BUFFER_SIZE
 
 La funzione check_all_return_adress gestisce:
