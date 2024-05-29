@@ -1,6 +1,8 @@
 {
     "files.associations": {
-        "dirver-core.h": "c"
+        "dirver-core.h": "c",
+        "string.h": "c",
+        "kss_hashtable.h": "c"
     },
     "makefile.makefilePath": "${workspaceFolder}/Makefile",
     "C_Cpp.errorSquiggles": "disabled",
