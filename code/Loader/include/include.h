@@ -58,7 +58,23 @@ struct elf_info {
 /*
  * Mapping
  */
-void map(unsigned char *data, struct elf_info *md);
+
+
+#ifdef LOG_SYSTEM
+    #ifdef RAND_PERC
+    void map(const unsigned char *data, struct elf_info *md, int is_interp, char *path_instr_info, char *input_file, int id_user, int perc)
+    #else
+    void map(const unsigned char *data, struct elf_info *md, int is_interp, char *path_instr_info, char *input_file, int id_user)
+    #endif
+#else
+    #ifdef RAND_PERC
+    void map(const unsigned char *data, struct elf_info *md, int is_interp, char *path_instr_info, int perc)
+    #else
+    void map(const unsigned char *data, struct elf_info *md, int is_interp, char *path_instr_info)
+    #endif
+#endif
+
+
 bool is_compatible_elf(const ElfW(Ehdr) *ehdr);
 size_t compute_total_memory_size(const ElfW(Ehdr) *ehdr, const ElfW(Phdr) *phdr);
 unsigned char *setup_memory(unsigned char *data, size_t total_to_map, ElfW(Phdr) *phdr, size_t *virtual_offset, ElfW(Ehdr) *ehdr, struct elf_info *md);
