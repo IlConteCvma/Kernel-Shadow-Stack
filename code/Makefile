@@ -1,5 +1,5 @@
 LKM_PATH := ./LKM
-LOADER_PATH : = ./Loader
+LOADER_PATH := ./Loader
 LOADER_EXE := $(LOADER_PATH)/Kss_loader
 COMMON_FLAGS := -I ./Loader/include/ -Wall -Werror -pedantic -std=gnu99 
 
