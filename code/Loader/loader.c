@@ -61,14 +61,14 @@ void load_and_exec(unsigned char *elf, char **argv, char **env, size_t *stack) {
 
     printf("[REFLECT EXECVES] The percentage of functions to be treated randomly is %d\n", perc);
     printf("[REFLECT EXECVES] The path of the new Elf file to be launched is%s\n", argv[3]);
-    //TODO map
 
+    map(elf, &exe, 0, argv[0], argv[3], id_user, perc)
     #else
     printf("[REFLECT EXECVES] The path of the new Elf file to be launched is%s\n", argv[2]);
-    //TODO map
+    map(elf, &exe, 0, argv[0], argv[2], id_user);
     #endif
 
-//love you <3  
+
 #else
     printf("[REFLECT EXECVES] The route of the directory containing the instrument information is %s\n", argv[0]);
     #ifdef RAND_PERC
@@ -81,17 +81,14 @@ void load_and_exec(unsigned char *elf, char **argv, char **env, size_t *stack) {
 
     printf("[REFLECT EXECVES] The percentage of functions to be treated randomly is %d\n", perc);
     printf("[REFLECT EXECVES] The path of the new Elf file to be launched is%s\n", argv[2]);
-    //TODO map
+    map(elf, &exe, 0, argv[0], perc);
 
     #else
     printf("[REFLECT EXECVES] The path of the new Elf file to be launched is%s\n", argv[1]);
-    //TODO map
+    map_elf(elf, &exe, 0, argv[0]);
     #endif
 #endif
 
-
-    // Map elf to mem
-    map(elf, &exe);
     if (exe.ehdr == MAP_FAILED) {
         dprint("Unable to map ELF file: %s\n", strerror(errno));
         abort();
@@ -117,7 +114,25 @@ void load_and_exec(unsigned char *elf, char **argv, char **env, size_t *stack) {
         }
         close(fd);
 
-        map(data, &interp);
+        //mapping interpeter
+#ifdef LOG_SYSTEM
+
+    #ifdef RAND_PERC
+            map(data, &interp, 1, NULL, NULL, -1, -1);
+    #else
+            map(data, &interp, 1, NULL, NULL, -1);
+    #endif //RAND_PERC
+
+#else //LOG_SYSTEM
+
+    #ifdef RAND_PERC
+            map(data, &interp, 1, NULL, -1);
+    #else
+            map(data, &interp, 1, NULL);
+    #endif //RAND_PERC
+
+#endif //LOG_SYSTEM
+
         munmap(data, statbuf.st_size);
         if (interp.ehdr == MAP_FAILED) {
             dprint("Unable to map interpreter for ELF file: %s\n", strerror(errno));
@@ -127,6 +142,22 @@ void load_and_exec(unsigned char *elf, char **argv, char **env, size_t *stack) {
     } else {
         interp = exe;
     }
+
+    
+#ifdef LOG_SYSTEM
+    #ifdef RAND_PERC
+        argv = argv + 3;
+    #else
+        argv = argv + 2;
+    #endif 
+#else 
+    #ifdef RAND_PERC
+        argv = argv + 2;
+    #else
+        argv = argv + 1;
+    #endif 
+#endif 
+
     // Count argc
     for (argc = 0; argv[argc]; argc++)
         ;

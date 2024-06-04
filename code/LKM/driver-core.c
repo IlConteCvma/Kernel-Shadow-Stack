@@ -343,11 +343,7 @@ static long my_ioctl(struct file *file, unsigned int cmd, unsigned long arg) {
     log_system_info *lsi;
     #endif
 
-    /*
-     * The Security_Medata command allows you to allocate safety metadata for the current thread.
-     * The IOCTL_INSTRUM_MAP command allows you to recover the instrument map to validate the
-     * requests for calls and return from the user program.
-     */
+    
 
     switch(cmd) {
 

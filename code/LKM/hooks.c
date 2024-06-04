@@ -296,8 +296,7 @@ int handler_finish_task_switch(struct kprobe *pk, struct pt_regs *regs) {
              * 2. Only the Security_Medata command command was performed: the element inside the hash table has been inserted
              * If you are using the monitoring system.It is possible to recover shared monitoring information but the
              * Map of instrumentation (if you use it) has not yet been recovered by the user.
-             * 3. The Security_Medata and IoCTL_instrum_MAP commands were performed: the element inside the hash table is
-             * has been inserted and it is possible to recover both the instrument map and monitoring information.
+             * 
              */
             /* Indicates whether the element corresponding to the current thread inside the hash table was found */
             found = 0;

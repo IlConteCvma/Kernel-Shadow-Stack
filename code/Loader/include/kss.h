@@ -20,9 +20,7 @@ typedef struct instrum_param {
     int et_dyn;
     int num_istr_call;
     int num_istr_ret;
-#if defined(IOCTL_INSTRUM_MAP) || defined(RANDOM_SUBSET_FUNC)
     char *path_instr_info;
-#endif
 #ifdef LOG_SYSTEM
     char *input_file;
     int id_user;
@@ -83,5 +81,7 @@ typedef struct random_index {
     struct random_index *next;
 } random_index;
 #endif //RANDOM_SUBSET_FUNC
+
+void do_instrumentation(instrum_param* param)
 
 #endif
