@@ -8,8 +8,8 @@
 #include <sys/mman.h>
 #include <arpa/inet.h>
 
-#include <include/include.h>
-#include <include/kss.h>
+#include "include/include.h"
+#include "include/kss.h"
 
 #define ELF_ARCH   ELFCLASS64
 #define ELFDATA_NATIVE  ELFDATA2LSB
