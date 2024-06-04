@@ -46,6 +46,14 @@
 #endif
 
 
+//path
+/* A little useful strings for the construction of the absolute paths in the recovery of instrument information*/
+#define file_path_number_suf_call   "call/number.txt"
+#define file_path_number_suf_ret    "ret/number.txt"
+#define dir_path_call_suf           "call/"
+#define dir_path_ret_suf            "ret/"
+#define node                        "/proc/kss_node"      /* Path of the node in /proc to communicate the activities to be performed at the kernel*/
+
 void load_and_exec(unsigned char* elf, char **argv, char **env, size_t *stack);
 
 

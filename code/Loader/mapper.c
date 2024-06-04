@@ -20,12 +20,7 @@
 /* List of the list of the list containing the information on the segments of the executable */
 info_seg * info_seg_head = NULL;
 
-/* A little useful strings for the construction of the absolute paths in the recovery of instrument information*/
-const char *file_path_number_suf_call = "call/number.txt";
-const char *file_path_number_suf_ret = "ret/number.txt";
-const char *dir_path_call_suf = "call/";
-const char *dir_path_ret_suf = "ret/";
-const char *node = "/proc/kss_node";       /* Path of the node in /proc to communicate the activities to be performed at the kernel*/
+
 
 /* Absolute path of the file containing the number of calls to be made up*/
 char file_path_number_call[256] = {0};
