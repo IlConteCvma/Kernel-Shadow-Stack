@@ -10,6 +10,8 @@
 #include <libgen.h>
 #include <time.h>
 
+#include <sys/ioctl.h>
+
 /**
  * do_instrumentation -Performs the institution of the call and ret instructions in the program
  * loaded by the Loader Elf.Possibly, communicate to the Linux kernel the instrument map for the
