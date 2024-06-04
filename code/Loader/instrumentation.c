@@ -1,6 +1,14 @@
 #include "include/include.h"
 #include "include/kss.h"
 
+#include <fcntl.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+
 /**
  * do_instrumentation -Performs the institution of the call and ret instructions in the program
  * loaded by the Loader Elf.Possibly, communicate to the Linux kernel the instrument map for the
