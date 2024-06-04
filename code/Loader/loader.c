@@ -85,7 +85,7 @@ void load_and_exec(unsigned char *elf, char **argv, char **env, size_t *stack) {
 
     #else
     printf("[REFLECT EXECVES] The path of the new Elf file to be launched is%s\n", argv[1]);
-    map_elf(elf, &exe, 0, argv[0]);
+    map(elf, &exe, 0, argv[0]);
     #endif
 #endif
 

@@ -85,15 +85,15 @@ bool is_compatible_elf(const ElfW(Ehdr) *ehdr) {
 
 #ifdef LOG_SYSTEM
     #ifdef RAND_PERC
-    void map(const unsigned char *data, struct elf_info *md, int is_interp, char *path_instr_info, char *input_file, int id_user, int perc)
+    void map(unsigned char *data, struct elf_info *md, int is_interp, char *path_instr_info, char *input_file, int id_user, int perc)
     #else
-    void map(const unsigned char *data, struct elf_info *md, int is_interp, char *path_instr_info, char *input_file, int id_user)
+    void map(unsigned char *data, struct elf_info *md, int is_interp, char *path_instr_info, char *input_file, int id_user)
     #endif
 #else
     #ifdef RAND_PERC
-    void map(const unsigned char *data, struct elf_info *md, int is_interp, char *path_instr_info, int perc)
+    void map(unsigned char *data, struct elf_info *md, int is_interp, char *path_instr_info, int perc)
     #else
-    void map(const unsigned char *data, struct elf_info *md, int is_interp, char *path_instr_info)
+    void map(unsigned char *data, struct elf_info *md, int is_interp, char *path_instr_info)
     #endif
 #endif
 {
@@ -121,7 +121,7 @@ bool is_compatible_elf(const ElfW(Ehdr) *ehdr) {
     struct instru_call_info *new_mapp_area = NULL;
 
     /* Pointer to an element maintaining the information relating to a segment of the ELF executable*/
-    info_seg *item; 
+    //info_seg *item; 
 
     is_interp_global = is_interp;
 
@@ -364,10 +364,6 @@ size_t map_segments(unsigned char *mapping, unsigned char *data, ElfW(Phdr) *phd
 
      //instrumentation kss
 
-    /*
-     * I check if the Map_elf () function has been invoked for the new program to be launched or for the relative
-     * interpreter.In the event that we are worlding the new program then we perform the instrument phase.
-    */
 
     if(!is_interp_global) {
         /*
@@ -423,7 +419,4 @@ mprotect_failed:
 	munmap(mapping, total_to_map);
     return -1;
 
-map_failed:
-    obj->ehdr = MAP_FAILED;
-    return -1;
 }

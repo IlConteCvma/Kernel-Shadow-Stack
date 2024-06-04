@@ -75,15 +75,15 @@ struct elf_info {
 
 #ifdef LOG_SYSTEM
     #ifdef RAND_PERC
-    void map(const unsigned char *data, struct elf_info *md, int is_interp, char *path_instr_info, char *input_file, int id_user, int perc);
+    void map(unsigned char *data, struct elf_info *md, int is_interp, char *path_instr_info, char *input_file, int id_user, int perc);
     #else
-    void map(const unsigned char *data, struct elf_info *md, int is_interp, char *path_instr_info, char *input_file, int id_user);
+    void map(unsigned char *data, struct elf_info *md, int is_interp, char *path_instr_info, char *input_file, int id_user);
     #endif
 #else
     #ifdef RAND_PERC
-    void map(const unsigned char *data, struct elf_info *md, int is_interp, char *path_instr_info, int perc);
+    void map(unsigned char *data, struct elf_info *md, int is_interp, char *path_instr_info, int perc);
     #else
-    void map(const unsigned char *data, struct elf_info *md, int is_interp, char *path_instr_info);
+    void map(unsigned char *data, struct elf_info *md, int is_interp, char *path_instr_info);
     #endif
 #endif
 
