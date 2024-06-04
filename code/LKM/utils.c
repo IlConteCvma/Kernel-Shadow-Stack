@@ -1,6 +1,6 @@
-#include "includes/utils.h"
 #include "includes/kss_struct.h"
-
+#include "includes/utils.h"
+#include "includes/driver-core.h"
 #include <linux/kprobes.h>
 #include <asm/trapnr.h>
 

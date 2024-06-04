@@ -1,6 +1,8 @@
+#ifdef LOG_SYSTEM
 #include "includes/logging.h"
 #include "includes/kss_struct.h"
 #include "includes/utils.h"
+#include "includes/driver-core.h"
 #include <linux/slab.h>
 
 /* Workqueue name */
@@ -131,6 +133,7 @@ int save_user_stack(unsigned long start_address, security_metadata *sm) {
     pk->type = 1;
     pk->user_stack = (unsigned long *)buffer;
     pk->user_stack_size = size_copy;
+
 
     if(sm->lsi == NULL) {
 
@@ -591,3 +594,5 @@ int write_no_call_event_to_log_buffer(unsigned long ret_instr_addr,
 
     return 0;
 }
+
+#endif

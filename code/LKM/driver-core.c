@@ -1,8 +1,12 @@
 /*INCLUDES*/
-#include "includes/dirver-core.h"
+#include "includes/driver-core.h"
+#include "includes/kss_struct.h"
 #include "includes/utils.h"
 #include "includes/hooks.h"
-#include "includes/kss_struct.h"
+#include "includes/kss_hashtable.h"
+#include "includes/instr-map.h"
+
+
 
 
 #ifdef LOG_SYSTEM
@@ -22,8 +26,22 @@ void kss_module_exit(void);
 
 
 /*Variable*/
-sysvec_spurious_apic_interrupt_t sysvec_spurious_apic_interrupt;    /* Pointer to the Co -High level C manager for the management of the disasters of the spuries interrupt  */
+int num_threads = 0;
+do_group_exit_t do_group_exit_addr;
 
+#ifdef LOG_SYSTEM
+int size_no_suc = 92 + 12;
+int size_suc    = 130 + 12;
+#endif
+
+sysvec_spurious_apic_interrupt_t sysvec_spurious_apic_interrupt;    /* Pointer to the Co -High level C manager for the management of the disasters of the spuries interrupt  */
+exc_invalid_op_t exc_invalid_op;                                    /* Top leader C manager of high level of default for the management of the INVALID OPCODE       */
+
+static struct info_patch info_patch_spurious;                       /* Data structure maintaining information for the entry spuria binary patching          */
+static struct info_patch info_patch_invalid_op;                     /* Data structure maintaining information for the Binary Patching of Entry Invalid Opcode  */
+
+
+static struct proc_dir_entry *my_proc_dir_entry;
 
 /* File Operations /proc */
 struct proc_ops proc_fops = {
@@ -330,8 +348,6 @@ static long my_ioctl(struct file *file, unsigned int cmd, unsigned long arg) {
     unsigned long *end_of_stack;
     int ret;
     ht_item *item;
-    char *program_name;
-    log_system_info *lsi;
     size_t size;
     int error_value;
     unsigned long *ret_array;

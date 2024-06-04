@@ -1,5 +1,5 @@
 #include "includes/kss_hashtable.h"
-#include "includes/dirver-core.h"
+#include "includes/driver-core.h"
 
 /*
  * This hash table is used to maintain the references to information that is shared among the threads of
@@ -40,8 +40,10 @@ void delete_ht_item(void) {
         hash_del(&(target->ht_list_next));
 
         /* Dealloco the shared data structures associated with the process */
+        #ifdef LOG_SYSTEM
         if((void *)(target->lsi->program_name) != NULL)         kfree((void *)(target->lsi->program_name));
         if((void *)(target->lsi) != NULL)                       kfree((void *)target->lsi);
+        #endif
 
         /* Dealloco the element in the hash table */
         kfree((void *)target);
@@ -62,6 +64,7 @@ void delete_ht_item(void) {
  * @return: return the value 0 if the identification of the process can be used;otherwise,
  * remain the value 1.
  */
+#ifdef LOG_SYSTEM
 int check_already_exists(char *program_name, int id_user) {
     
     int bkt;
@@ -79,3 +82,4 @@ int check_already_exists(char *program_name, int id_user) {
     
     return found;
 }
+#endif

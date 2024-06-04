@@ -226,7 +226,7 @@ void del_item_stack(stack_item *item, security_metadata *sm) {
     insert_free_item(item, sm);
 }
 
-
+#ifdef SINGLE_ADDRESS_ONE_COPY_FROM_USER
 #ifdef LOG_SYSTEM
 int single_address_one_copy(stack_item* top_stack, unsigned long user_stack_address, unsigned long *return_address, security_metadata *sm, unsigned long regs_ip)
 #else
@@ -424,7 +424,10 @@ int single_address_one_copy(stack_item* top_stack, unsigned long user_stack_addr
 
     return suc_counter;
 }
+#endif
 
+
+#if defined(SINGLE_ADDRESS) || defined(MIX_ADDRESS)
 #ifdef LOG_SYSTEM
 int single_address(stack_item* top_stack, unsigned long user_stack_address, unsigned long *return_address, security_metadata *sm, unsigned long regs_ip)
 #else
@@ -646,7 +649,9 @@ int single_address(stack_item* top_stack, unsigned long user_stack_address, unsi
 
     return suc_counter;
 }
+#endif
 
+#ifdef BLOCK_ADDRESS
 #ifdef LOG_SYSTEM
 int block_address(stack_item* top_stack, unsigned long user_stack_address, unsigned long *return_address, security_metadata *sm, unsigned long regs_ip)
 #else
@@ -865,7 +870,10 @@ curr_item = top_stack;
 
     return suc_counter;
 }
+#endif
 
+
+#ifdef MIX_ADDRESS
 #ifdef LOG_SYSTEM
 int iter_block_address(stack_item* top_stack, unsigned long user_stack_address, unsigned long *return_address, security_metadata *sm, unsigned long regs_ip)
 #else
@@ -1012,6 +1020,7 @@ int iter_block_address(stack_item* top_stack, unsigned long user_stack_address, 
 
     return suc_counter;
 }
+#endif
 
 
 /**

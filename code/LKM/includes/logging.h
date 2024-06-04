@@ -36,15 +36,7 @@ typedef struct param_kworker {
 
 // Functions
 extern void flush_buffer_log(unsigned long data);
-extern int save_user_stack(unsigned long start_address, security_metadata *sm);
-extern int init_buffer_log(security_metadata *sm);
-extern int buffer_log_switch(security_metadata *sm);
-extern int write_suc_event_to_log_buffer(unsigned long ret_addr_kernel, 
-                unsigned long ret_addr_user, unsigned long ret_instr_addr, security_metadata *sm);
-extern int write_ret_event_to_log_buffer(unsigned long ret_instr_addr, unsigned long return_address, 
-                security_metadata *sm, bool is_ii);
-extern int write_call_event_to_log_buffer(unsigned long target_func_addr, unsigned long return_address, security_metadata *sm);
-extern int write_no_call_event_to_log_buffer(unsigned long ret_instr_addr, unsigned long return_address, security_metadata *sm);
+
 
 
 

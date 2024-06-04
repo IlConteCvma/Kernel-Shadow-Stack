@@ -103,6 +103,21 @@ extern int iter_block_address(stack_item* top_stack, unsigned long user_stack_ad
 extern int check_all_return_adress(stack_item* top_stack, unsigned long user_stack_address, unsigned long *return_address, security_metadata *sm);
 #endif
 
+//in utils.c
+extern int check_0x06(unsigned long ret_instr_addr, security_metadata *sm);
+extern int check_int_0xFF(unsigned long call_instr_addr, security_metadata *sm) ;
+
+//in logging.c
+extern int save_user_stack(unsigned long start_address, security_metadata *sm);
+extern int init_buffer_log(security_metadata *sm);
+extern int buffer_log_switch(security_metadata *sm);
+extern int write_suc_event_to_log_buffer(unsigned long ret_addr_kernel, 
+                unsigned long ret_addr_user, unsigned long ret_instr_addr, security_metadata *sm);
+extern int write_ret_event_to_log_buffer(unsigned long ret_instr_addr, unsigned long return_address, 
+                security_metadata *sm, bool is_ii);
+extern int write_call_event_to_log_buffer(unsigned long target_func_addr, unsigned long return_address, security_metadata *sm);
+extern int write_no_call_event_to_log_buffer(unsigned long ret_instr_addr, unsigned long return_address, security_metadata *sm);
+
 #ifdef SINGLE_ADDRESS_TIMER
 extern unsigned long average_time_one_byte ;
 extern unsigned long total_time_one_byte ;

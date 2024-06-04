@@ -1,6 +1,7 @@
-#include "includes/dirver-core.h"
+#include "includes/driver-core.h"
 #include "includes/hooks.h"
 #include "includes/kss_struct.h"
+#include "includes/kss_hashtable.h"
 #include "includes/utils.h"
 
 
@@ -161,10 +162,10 @@ int handler_finish_task_switch(struct kprobe *pk, struct pt_regs *regs) {
     security_metadata *sm;
     unsigned long *end_of_stack;
 
-#ifdef LOG_SYSTEM
+
     int found;
     ht_item *data;
-#endif
+
 
     /* Recovery the absolute path of the program of which the current process is an application */ 
     absolute_path = get_absolute_pathname(buf);

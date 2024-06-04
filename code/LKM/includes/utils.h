@@ -24,9 +24,6 @@
 #define DEBUG //TODO remove
 //TODO change includes !!
 #ifdef DEBUG
-#include <stdio.h>
-#include <errno.h>
-#include <string.h>
 
 //info function
 #define dprint_info(...) (pr_info(__VA_ARGS__))
@@ -104,8 +101,7 @@ extern void kill_process(void);
 extern int is_FF_call(unsigned char *instr_addr);
 extern int is_E8_call(unsigned char *instr_addr);
 extern int check_call_security(unsigned char *ret_addr_user);
-extern int check_0x06(unsigned long ret_instr_addr, security_metadata *sm);
-extern int check_int_0xFF(unsigned long call_instr_addr, security_metadata *sm) ;
+
 extern unsigned long get_full_offset_by_vector(gate_desc *idt, int vector_number);
 extern unsigned long get_full_offset_spurious_interrput(gate_desc *idt);
 extern unsigned long get_full_offset_invalid_opcode(gate_desc *idt);
