@@ -13,6 +13,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <stdio.h>
 
 #ifdef EXEC_TIME
     #define TIME if(1)
@@ -37,7 +38,7 @@
 #endif
 
 #if DEBUG
-    #include <stdio.h>
+    
     #include <errno.h>
     #include <string.h>
     #define dprint(...) (printf(__VA_ARGS__))
