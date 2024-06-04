@@ -54,6 +54,11 @@
 #define dir_path_ret_suf            "ret/"
 #define node                        "/proc/kss_node"      /* Path of the node in /proc to communicate the activities to be performed at the kernel*/
 
+extern char file_path_number_call[256];
+extern char file_path_number_ret[256];
+extern char dir_path_call[256];
+extern char dir_path_ret[256] ;
+
 void load_and_exec(unsigned char* elf, char **argv, char **env, size_t *stack);
 
 
