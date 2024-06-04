@@ -15,6 +15,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <errno.h>
+#include <string.h>
 
 #ifdef EXEC_TIME
     #define TIME if(1)
@@ -39,7 +40,6 @@
 #endif
 
 #if DEBUG
-    #include <string.h>
     #define dprint(...) (printf(__VA_ARGS__))
 #else
     #define dprint(...)

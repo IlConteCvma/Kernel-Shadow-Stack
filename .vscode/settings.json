@@ -6,7 +6,8 @@
         "logging.h": "c",
         "kss_struct.h": "c",
         "utils.h": "c",
-        "include.h": "c"
+        "include.h": "c",
+        "types.h": "c"
     },
     "makefile.makefilePath": "${workspaceFolder}/Makefile",
     "C_Cpp.errorSquiggles": "disabled",
