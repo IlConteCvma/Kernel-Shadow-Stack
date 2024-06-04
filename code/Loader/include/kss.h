@@ -82,6 +82,6 @@ typedef struct random_index {
 } random_index;
 #endif //RANDOM_SUBSET_FUNC
 
-void do_instrumentation(instrum_param* param)
+void do_instrumentation(instrum_param* param);
 
 #endif
