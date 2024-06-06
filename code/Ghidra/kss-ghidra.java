@@ -71,13 +71,13 @@ public class GetRetCallWithLabel extends GhidraScript {
 		String filename_call;
 		String filename_ret;
 		String path_program_dir;
-		static String call_tag = "call_";
-		static String ret_tag = "ret_";
-		static String call_subdir = "/call";
-		static String ret_subdir = "/ret";
-		static String sep = "_";
-		static String format = ".txt";
-		static String num_call_file = "number";
+		String call_tag = "call_";
+		String ret_tag = "ret_";
+		String call_subdir = "/call";
+		String ret_subdir = "/ret";
+		String sep = "_";
+		String format = ".txt";
+		String num_call_file = "number";
 		ArrayList<Long> addr_already_write;
 	
 
