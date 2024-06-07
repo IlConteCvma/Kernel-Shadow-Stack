@@ -1,4 +1,9 @@
-
+//Ricerca delle CALL 0xE8 e delle RET 0xC3 etichettandole nel caso di scenari IN
+//@author Marco Calavaro
+//@category code_analysis
+//@keybinding 
+//@menupath 
+//@toolbar 
 
 import ghidra.app.script.GhidraScript;
 import ghidra.program.model.mem.*;
@@ -35,7 +40,7 @@ public class GetRetCallWithLabel extends GhidraScript {
 
     int num_call_in = 0;
 	//TODO
-    public static String path_base = "/home/marco/kss-test";
+    String path_base = "/home/marco/kss-test/";
     /* L'i-esimo elemento delle tre liste successive contiene le informazioni relative ad una stessa funzione */
 
     /* Lista contenente gli indirizzi di tutte le RET per ogni funzione di interesse */
