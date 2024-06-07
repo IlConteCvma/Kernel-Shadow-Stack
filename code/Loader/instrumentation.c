@@ -160,9 +160,9 @@ redo_random_number:
 out:
 #endif //RAND_PERC
 
-#ifdef DEBUG_RAND_FUNC
-    printf("[Instrumentation] The number of functions that will be considered is %d\n", rand_subset_dim);
-#endif
+
+    dprint("[Instrumentation] The number of functions that will be considered is %d\n", rand_subset_dim);
+
 
     /* Alloco the array that will be used to determine if a numerical index has already been generated */
     idx_used = (int *)malloc(sizeof(int) * rand_subset_dim);
@@ -177,9 +177,9 @@ out:
         idx_used[i] = -1;
     }
 
-#ifdef DEBUG_RAND_FUNC
-    printf("[Instrumentation] Number of functions available:%d\tNumber of functions to be made:%d\n", num_func, rand_subset_dim);
-#endif
+
+    dprint("[Instrumentation] Number of functions available:%d\tNumber of functions to be made:%d\n", num_func, rand_subset_dim);
+
 
     /*
      * The an array 'Idx_used' is used to memorize random identifiers that
@@ -199,17 +199,17 @@ out:
 
      for(int i=0; i < rand_subset_dim; i++) {
 
-#ifdef DEBUG_RAND_FUNC
-        printf("[Instrumentation] Generation of the numerical random identification #%d/%d...\n", i + 1, rand_subset_dim);
-#endif
+
+        dprint("[Instrumentation] Generation of the numerical random identification #%d/%d...\n", i + 1, rand_subset_dim);
+
 
 redo:
         /* Road randomly a new numerical function identification */
         new_rand_idx = rand() % num_func;
 
-#ifdef DEBUG_RAND_FUNC
-        printf("[Instrumentation]Numeric random identification generated:%d...\n", new_rand_idx);
-#endif
+
+        dprint("[Instrumentation]Numeric random identification generated:%d...\n", new_rand_idx);
+
 
         /* This label allows you to check if the identification has already been generated*/
         is_used = false;
@@ -229,9 +229,9 @@ redo:
 
         if(is_used) goto redo;
 
-#ifdef DEBUG_RAND_FUNC
-        printf("[Instrumentation] Randomic numerical identification #%d: %d\n", i + 1, new_rand_idx);
-#endif
+
+        dprint("[Instrumentation] Randomic numerical identification #%d: %d\n", i + 1, new_rand_idx);
+
 
         /* Register the numerical identification of the function that has been generated */
         idx_used[curr_idx_used] = new_rand_idx;
@@ -275,16 +275,7 @@ redo:
         }
     }  
 
-#ifdef DEBUG_RAND_FUNC
-    curr_random_idx = random_idx_list_head;
 
-    printf("Printing of the list containing the random identifiers that have been generated:\n");
-
-    while(curr_random_idx != NULL) {
-        printf("%ld\n", curr_random_idx->idx);
-        curr_random_idx = curr_random_idx->next;
-    }
-#endif //DEBUG_RAND_FUNC
 
 no_rand:
 
