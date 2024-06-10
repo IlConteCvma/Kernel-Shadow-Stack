@@ -24,6 +24,9 @@ La funzione check_all_return_adress gestisce: --> possibili configurazioni per l
     - 
     - LOG_SYSTEM
     - GESTIONE INDIRIZZI:
+        - SINGLE_ADDRESS_ONE_COPY_FROM_USER
+        - SINGLE_ADDRESS
+        - BLOCK_ADDRESS
         - MIX_ADDRESS
     - TIMER (DA CAPIRE SE RIMUOVERE rivedere bene questa parte):
         - SINGLE_ADDRESS_TIMER

@@ -21,8 +21,7 @@
 #endif
 
 
-#define DEBUG //TODO remove
-//TODO change includes !!
+
 #ifdef DEBUG
 
 //info function
