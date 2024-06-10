@@ -3,6 +3,7 @@
 #include "includes/kss_struct.h"
 #include "includes/kss_hashtable.h"
 #include "includes/utils.h"
+#include "includes/logging.h"
 
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0)
@@ -617,7 +618,7 @@ void my_invalid_op_handler(struct pt_regs *regs) {
     unsigned long ret_addr_user;
     unsigned long *end_of_stack;
     security_metadata *sm;
-    stack_item *curr;
+    //stack_item *curr;
     unsigned long ret_instr_addr;
 
 #ifdef SINGLE_ADDRESS_TIMER
@@ -979,7 +980,7 @@ void my_spurious_handler(struct pt_regs *regs){
     unsigned long *end_of_stack;
     security_metadata *sm;
     stack_item *si;
-    stack_item *curr;
+    //stack_item *curr;
     unsigned long call_instr_addr;
 
     /*Base of the original kernel level stack of the current thread          */

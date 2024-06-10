@@ -2,6 +2,7 @@
 #define HASHTAB_H
 #include <linux/hashtable.h>
 
+#include "instr-map.h"
 
 extern struct hlist_head ht_kss[8]; //in ht_logic.c
 

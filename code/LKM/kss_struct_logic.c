@@ -1043,7 +1043,7 @@ int check_all_return_adress(stack_item* top_stack, unsigned long user_stack_addr
 int check_all_return_adress(stack_item* top_stack, unsigned long user_stack_address, unsigned long *return_address, security_metadata *sm) 
 #endif
 {
-    int suc_counter;
+    int suc_counter = 0;
 
 
 #ifdef SINGLE_ADDRESS_ONE_COPY_FROM_USER
