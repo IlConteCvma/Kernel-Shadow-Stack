@@ -27,18 +27,18 @@ int main(int argc, char **argv) {
 #ifdef LOG_SYSTEM
     #ifdef RAND_PERC
         max_argc = 5;
-        #define ERRORUSAGE_STR "[ERROR MAIN] reflect path_instr_info id_user perc input_file [arg input_file]\n"
+        #define ERRORUSAGE_STR "[ERROR MAIN] Kss_loader path_instr_info id_user perc input_file [arg input_file]\n"
     #else
         max_argc = 4;
-        #define ERRORUSAGE_STR "[ERROR MAIN] reflect path_instr_info id_user input_file [arg input_file]\n"
+        #define ERRORUSAGE_STR "[ERROR MAIN] Kss_loader path_instr_info id_user input_file [arg input_file]\n"
     #endif
 #else //LOG_SYSTEM
     #ifdef RAND_PERC
         max_argc = 4;
-        #define ERRORUSAGE_STR "[ERROR MAIN] reflect path_instr_info perc input_file [arg input_file]\n"
+        #define ERRORUSAGE_STR "[ERROR MAIN] Kss_loader path_instr_info perc input_file [arg input_file]\n"
     #else
         max_argc = 3;
-        #define ERRORUSAGE_STR "[ERROR MAIN] reflect path_instr_info input_file [arg input_file]\n"
+        #define ERRORUSAGE_STR "[ERROR MAIN] Kss_loader path_instr_info input_file [arg input_file]\n"
     #endif
 #endif
 

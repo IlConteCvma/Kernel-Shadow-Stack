@@ -5,6 +5,9 @@ COMMON_FLAGS = -I ./Loader/include/ -Wall -Werror -pedantic -std=gnu99
 LOADER_EXTRA_FLAGS =
 KSS_EXTRA_CFLAGS = 
 
+# default def
+CFU := 1
+
 obj-m := kss_module.o
 kss_module-y :=  	$(LKM_PATH)/driver-core.o \
 					$(LKM_PATH)/logging.o \

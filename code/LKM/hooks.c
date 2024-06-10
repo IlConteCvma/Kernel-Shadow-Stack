@@ -618,7 +618,7 @@ void my_invalid_op_handler(struct pt_regs *regs) {
     unsigned long ret_addr_user;
     unsigned long *end_of_stack;
     security_metadata *sm;
-    //stack_item *curr;
+
     unsigned long ret_instr_addr;
 
 #ifdef SINGLE_ADDRESS_TIMER
@@ -938,6 +938,7 @@ void my_invalid_op_handler(struct pt_regs *regs) {
              */
 
     #ifdef DEBUG
+            stack_item *curr;
             curr = sm->top;
             pr_info("%s: [INVALID OPCODE HOOK][SHOW STACK KERNEL][%d] --------------------START---------------------- \n", MOD_NAME, current->pid);
             while(curr != NULL) {
@@ -980,7 +981,7 @@ void my_spurious_handler(struct pt_regs *regs){
     unsigned long *end_of_stack;
     security_metadata *sm;
     stack_item *si;
-    //stack_item *curr;
+    
     unsigned long call_instr_addr;
 
     /*Base of the original kernel level stack of the current thread          */
@@ -1225,6 +1226,7 @@ void my_spurious_handler(struct pt_regs *regs){
         
     #endif
     #ifdef DEBUG
+        stack_item *curr;
         curr = sm->top;
         pr_info("%s: [MY SPURIOUS HOOK][SHOW STACK KERNEL][%d] --------------------START---------------------- \n", MOD_NAME, current->pid);
         while(curr != NULL) {
