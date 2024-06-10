@@ -30,11 +30,11 @@ LOADER_SOURCE_FILES := \
 
 # loader and kss common configuration
 ifeq ($(DEBUG),1)
-   LOADER_EXTRA_FLAGS+=-DDEBUG
+   LOADER_EXTRA_FLAGS+=-g -DDEBUG
    KSS_EXTRA_CFLAGS+=-DDEBUG
 endif
 ifeq ($(DEBUG),2)
-   LOADER_EXTRA_FLAGS+=-DDEBUG
+   LOADER_EXTRA_FLAGS+=-g -DDEBUG 
    KSS_EXTRA_CFLAGS+=-DDEBUG_V
 endif
 ifdef LOG
