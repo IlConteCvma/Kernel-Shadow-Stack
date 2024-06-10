@@ -22,11 +22,17 @@ LOADER_SOURCE_FILES := \
 	$(LOADER_PATH)/jump.c \
 
 
+kernel: 
+	make -I $(LKM_PATH)/includes  -C $(KDIR) M=$(PWD) modules
+loader:
+	gcc $(COMMON_FLAGS) $(LOADER_SOURCE_FILES) -o $(LOADER_EXE)
+
 all:
 	
 	rm -f $(LOADER_EXE)
-	gcc $(COMMON_FLAGS) $(LOADER_SOURCE_FILES) -o $(LOADER_EXE)
-	make -I $(LKM_PATH)/includes  -C $(KDIR) M=$(PWD) modules 
+	kernel
+	loader
+	
 
 clean clear:
 	rm -f $(LOADER_EXE)

@@ -3,16 +3,16 @@
 APPUNTI TODO
 
 //TODO remove
-per debbug (vedi utils.h): 
+per debbug (vedi utils.h): --> debug a vari livelli
     - DUBUG
     - DEBUG_V
     - DEBUG_TEST
 
 capire cosa fare con:
     - MIX_ADDRESS (IN single address), anche nel driver-core.c funzione ioctl
-    - CHECK_BUFFER_SIZE
+    - CHECK_BUFFER_SIZE --> superfluo ?
 
-La funzione check_all_return_adress gestisce:
+La funzione check_all_return_adress gestisce: --> possibili configurazioni per la copy from user 
     - SINGLE_ADDRESS_ONE_COPY_FROM_USER
     - SINGLE_ADDRESS
     - BLOCK_ADDRESS
