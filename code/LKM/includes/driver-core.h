@@ -61,6 +61,6 @@ extern int size_suc    ; //in driver-core.c
  * perform the logic of security architecture and not the logic of the default management of the events present in
  * Kernel Linux.
  */
-#define absolute_path_elf_loader  "reflect"
+#define absolute_path_elf_loader  "Kss_loader"
 
 #endif
