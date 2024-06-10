@@ -42,11 +42,11 @@ int is_interp_global;
 
 
 /*
- * init_path - Inizializza i percorsi assoluti utilizzati dal Loader ELF per ricavare le informazioni
- * necessarie a instrumentare il nuovo eseguibile da lanciare.
- *
- * @path_instr_info: Percorso assoluto della directory contenente le informazioni di instrumentazione 
- */
+ * Init_path - Initialize the absolute paths used by the Loader Elf to obtain the information
+* necessary to instruct the new executable to be launched.
+*
+* @path_instr_info: Absolute path of the directory containing the instrument information
+*/
 void init_path(char *path_instr_info) {
 
     /* Settagio percorso assoluto del file contenente il numero delle istruzioni di CALL */

@@ -317,7 +317,7 @@ int handler_finish_task_switch(struct kprobe *pk, struct pt_regs *regs) {
                      */
 
                     if((void *)data->instrum_map_address != NULL) {
-                        dprint_info_hook("%s: [KPROBE finish_task_switch()] [%d] Indirizzo mappa di instrumentazione = %px\tReference Counter = %d\n",
+                        dprint_info_hook("%s: [KPROBE finish_task_switch()] [%d] Address map of the instrument = %px\tReference Counter = %d\n",
                                 MOD_NAME,
                                 current->pid,
                                 (void *)data->instrum_map_address,
@@ -332,7 +332,7 @@ int handler_finish_task_switch(struct kprobe *pk, struct pt_regs *regs) {
                      * performed completely (being the thread not descalable in that period).
                      */
                     if((void *)data->lsi == NULL) {
-                        pr_err("%s: [KPROBE finish_task_switch()] [%d] La base dovrebbe essere stata già comunicata dal Loader ELF ma non è presente...\n",
+                        pr_err("%s: [KPROBE finish_task_switch()] [%d] The base should have already been communicated by the Loader Elf but it is not present...\n",
                         MOD_NAME,
                         current->pid);
                     }
@@ -351,7 +351,7 @@ int handler_finish_task_switch(struct kprobe *pk, struct pt_regs *regs) {
             }
 
             if(!found) {
-                dprint_info_hook("%s: [KPROBE finish_task_switch()] [%d] Il Loader ELF non ha ancora comunicato la mappa di instrumentazione...\n", MOD_NAME, current->pid);
+                dprint_info_hook("%s: [KPROBE finish_task_switch()] [%d] The Loader Elf has not yet communicated the instrument map...\n", MOD_NAME, current->pid);
             }
 
             /* Set the pointer to the data structure containing the security metadata             */
@@ -473,7 +473,7 @@ next_step_exit:
             /* I check if the current element is the one associated with the current process*/
             if((unsigned long)data->mm_address == (unsigned long)current->mm) {
                 if((unsigned long)data->instrum_map_address != (unsigned long)sm->instrum_map) {
-                    pr_err("%s: [ERRORE KPROBE do_exit()] [%d] Le mappe di instrumentazione non coincidono: %px\t%px\n",
+                    pr_err("%s: [ERRORE KPROBE do_exit()] [%d] Instrumentation maps do not coincide: %px\t%px\n",
                     MOD_NAME,
                     current->pid,
                     (void *)data->instrum_map_address,

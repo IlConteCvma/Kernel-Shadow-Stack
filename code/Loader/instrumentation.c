@@ -347,14 +347,14 @@ no_rand:
 
     if(param->num_istr_ret == 0) {
 
-        dprint("[INSTRUMENTAZIONE] Non ci sono CALL da instrumentare\n");
+        dprint("[Instrumentation] Non ci sono CALL da instrumentare\n");
 
         my_ioctl_data->ret_array = NULL;
     } else {
         my_ioctl_data->ret_array  = (unsigned long *)calloc(my_ioctl_data->ret_num, sizeof(unsigned long));
 
         if((my_ioctl_data->ret_array) == NULL) {
-            perror("[ERRORE INSTRUMENTAZIONE] Errore allocazione array di indirizzi di memoria dei byte 0x06");
+            perror("[Instruments error] Anscuen angry error of byte memory addresses 0x06");
             exit(EXIT_FAILURE);
         }
     }
@@ -367,14 +367,14 @@ no_rand:
     num_istr_did = 0;
 
 
-    dprint("[INSTRUMENTAZIONE] [CALL] Nome della directory contenente le informazioni per instrumentare le CALL: %s\n", dir_path_call);
+    dprint("[INSTRUMENTAZIONE] [CALL] Name of the directory containing the information to instruct the CALL: %s\n", dir_path_call);
 
 
     /* Apro la directory per recuperare gli offset delle istruzioni di CALL da instrumentare */
     dir = opendir(dir_path_call);
 
     if(dir == NULL) {
-        perror("[ERRORE INSTRUMENTAZIONE] [CALL] Errore nell'apertura della directory contenente le informazioni per instrumentare le CALL");
+        perror("[Instruments error] [CALL] Error in opening the directory containing the information to instruct the CALL");
         exit(EXIT_FAILURE);
     }
 
