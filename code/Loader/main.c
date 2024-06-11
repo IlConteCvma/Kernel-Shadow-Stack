@@ -4,7 +4,7 @@
 int main(int argc, char **argv) {
     /*
 * The Loader Elf process takes the following parameters:
-* 0. 'Reflect': represents the name of the ELF Loader executable that has been launched.
+* 0. 'Kss_loader': represents the name of the ELF Loader executable that has been launched.
 * 1. 'Path_instr_info': represents the absolute path of the directory containing the information necessary for
 * Instrument the executable that will be loaded by the Loader Elf.
 * 2. 'Id_user': represents a numerical identification that is passed only if the

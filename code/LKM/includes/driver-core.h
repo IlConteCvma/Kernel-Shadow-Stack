@@ -37,8 +37,8 @@ extern sysvec_spurious_apic_interrupt_t sysvec_spurious_apic_interrupt;
 
 #ifdef LOG_SYSTEM
 /* The location in the System file and the format of log files produced by the monitoring system                       */
-#define log_path_format  "/home/cap/%s_%d_%d_log.txt"
-#define user_stack_path_format  "/home/cap/%s_%d_%d_user_stack.data"
+#define log_path_format  "/home/marco/kss-log/%s_%d_%d_log.txt"
+#define user_stack_path_format  "/home/marco/kss-log/%s_%d_%d_user_stack.data"
 
 /* List of strings containing the event format for the various types of events supported by architecture     */
 #define no_call_format  "[NO CALL] :Address RETURN = 0x%px\tAddress di ritorno = 0x%px\n"
