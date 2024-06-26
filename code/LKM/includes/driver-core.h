@@ -30,7 +30,6 @@ typedef void (*do_group_exit_t)(int code);
 extern do_group_exit_t do_group_exit_addr; //in driver-core.c
 // Global variables
 
-
 /* Takes into account the number of threads that are inside the architecture and which are still running              */
 extern int num_threads;
 extern exc_invalid_op_t exc_invalid_op; 
