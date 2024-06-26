@@ -303,13 +303,18 @@ public class GetRetCallWithLabel extends GhidraScript {
 					writer.print(",");
 					writer.print(Integer.toString(i));
 					writer.print(",");
-					writer.println(good_funcs.get(i).getName());
+					String tmp = good_funcs.get(i).getName();
+					if (tmp.length() > 50){
+						writer.println(tmp.substring(0,50));
+					}else{
+						writer.println(tmp);
+					}
 					total_call = total_call + 1;
 				}
 				writer.flush();
 				
 			} catch (Exception e) {
-				printf("Errore nella scrittura su File degli offset di CALL");
+				printf("Errore nella scrittura su File degli offset di CALL\n");
 			}
 		}
 
@@ -361,7 +366,12 @@ public class GetRetCallWithLabel extends GhidraScript {
 					writer.print(",");
 					writer.print(Integer.toString(i));
 					writer.print(",");
-					writer.println(good_funcs.get(i).getName());
+					String tmp = good_funcs.get(i).getName();
+					if (tmp.length() > 50){
+						writer.println(tmp.substring(0,50));
+					}else{
+						writer.println(tmp);
+					}
 					total_ret = total_ret + 1;
 				}
 				writer.flush();

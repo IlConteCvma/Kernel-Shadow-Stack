@@ -288,7 +288,11 @@ void kss_module_exit(void) {
 
 redo_exit:
 
-    if(num_threads) {
+    if(num_threads > 0) {
+        pr_info("%s: [MODULE EXIT] [%d] Number of threads %d\n",
+            MOD_NAME,
+            current->pid,
+            num_threads);
         msleep(PERIOD * 1000);
         goto redo_exit;
     }
@@ -452,7 +456,7 @@ static long my_ioctl(struct file *file, unsigned int cmd, unsigned long arg) {
                     if((void *)lsi != NULL)             kfree((void *)lsi);
                     if((void *)program_name != NULL)    kfree((void *)program_name);
                     preempt_enable();
-                    pr_err("%s: [ERRORE IOTCL] [%d] [0] L'identificativo scelto per il processo corrente è stato già utilizzato in precedenza\n",
+                    pr_err("%s: [ERROR IOTCL] [%d] [0] The identification chosen for the current process has already been used previously\n",
                     MOD_NAME,
                     current->pid);
                     return -EINVAL;

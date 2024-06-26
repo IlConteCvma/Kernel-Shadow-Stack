@@ -613,7 +613,7 @@ no_rand:
                     }                   
                     
                 } else {
-                    printf("[ERRORE INSTRUMENTAZIONE] [CALL] Valore non valido\n");
+                    printf("[ERRORE INSTRUMENTAZIONE] [CALL] Valore non valido (%lx,%d,%d,%s)\n",offset_instr,is_in,id_func,func_name);
                     exit(EXIT_FAILURE);
                 }
 
@@ -787,7 +787,7 @@ no_call_instr:
                     }                   
                     
                 } else {
-                    printf("[ERRORE INSTRUMENTAZIONE] [RET] Valore non valido\n");
+                    printf("[ERRORE INSTRUMENTAZIONE] [RET] Valore non valido (%lx,%d,%d,%s)\n",offset_instr,is_in,id_func,func_name);
                     exit(EXIT_FAILURE);
                 }
 

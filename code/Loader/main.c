@@ -11,7 +11,7 @@ int main(int argc, char **argv) {
 * monitoring of the new process. It is an identification with which log files will be created
 * associated with the new process and will allow you to have different processes that are instances of one
 * Same application.
-* 3. 'Because: percentage of the available functions that must be made in a random way
+* 3. 'perc: percentage of the available functions that must be made in a random way
 * 4. 'Input_file: represents the absolute path of the file that will have to be loaded by the Loader Elf.
 */
 
