@@ -1164,6 +1164,10 @@ public class GetRetCallWithLabel extends GhidraScript {
 
 								/* Recupero il blocco di codice che contiene l'istruzione target del salto		*/
 								CodeBlock codeBlockTarget = codeBlockModel.getCodeBlockAt(references[i].getToAddress(), monitor);
+								if(codeBlockTarget == null){
+									printf("Code block %d is null\n",i);
+									continue;
+								}
 
 								if(func.getName().equals("FUN_00147020")) {
 									printf("Blocco target del salto [%x, %x]\n", codeBlockTarget.getMinAddress().getOffset(), codeBlockTarget.getMaxAddress().getOffset());
