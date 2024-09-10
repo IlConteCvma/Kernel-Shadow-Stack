@@ -1166,7 +1166,7 @@ public class GetRetCallWithLabel extends GhidraScript {
 								CodeBlock codeBlockTarget = codeBlockModel.getCodeBlockAt(references[i].getToAddress(), monitor);
 								if(codeBlockTarget == null){
 									printf("Code block %d is null\n",i);
-									continue;
+									break;
 								}
 
 								if(func.getName().equals("FUN_00147020")) {
