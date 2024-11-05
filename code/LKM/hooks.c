@@ -35,12 +35,15 @@ struct kprobe kp_finish_task_switch = {
     .pre_handler = handler_finish_task_switch
 };
 
+/*
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6,0,0)
 struct kprobe kp_finish_task_switch_cold = {
     .symbol_name = finish_task_switch_cold_func,
     .pre_handler = handler_finish_task_switch
 };
 #endif
+*/
+
 
 /*
  * Kernel Probe to intercept the execution of the Do_exit () function.In the
@@ -75,7 +78,8 @@ int install_kprobes(void) {
         return 0;
     }
 
-     #if LINUX_VERSION_CODE >= KERNEL_VERSION(6,0,0)
+    /*
+    #if LINUX_VERSION_CODE >= KERNEL_VERSION(6,0,0)
     ret = register_kprobe(&kp_finish_task_switch_cold);
 
     if(ret < 0) {
@@ -87,15 +91,18 @@ int install_kprobes(void) {
         return 0;
     }
     #endif
+    */
 
     /* Install the KPROBE on the do_exit()                 */
     ret = register_kprobe(&kp_do_exit);
 
     if(ret < 0) {
         unregister_kprobe(&kp_finish_task_switch);
+        /*
         #if LINUX_VERSION_CODE >= KERNEL_VERSION(6,0,0)
         unregister_kprobe(&kp_finish_task_switch_cold);
         #endif
+        */
         pr_err("%s: [ERROR MODULE INIT] [INSTALLATION KPROBE] [%d] Error in the recording of the KPROBE on the 'do_exit()'\n",
         MOD_NAME,
         current->pid);
@@ -112,9 +119,12 @@ int install_kprobes(void) {
 
     if(ret < 0) {
         unregister_kprobe(&kp_finish_task_switch);
+        /*
         #if LINUX_VERSION_CODE >= KERNEL_VERSION(6,0,0)
         unregister_kprobe(&kp_finish_task_switch_cold);
         #endif
+        */
+
         unregister_kprobe(&kp_do_exit);
         pr_err("%s: [ERROR MODULE INIT] [INSTALLATION KPROBE] [%d] Error in the recording of the KPROBE on the 'kernel_clone()'\n",
         MOD_NAME,
@@ -132,10 +142,12 @@ int install_kprobes(void) {
 void remove_probes(void){
     unregister_kprobe(&kp_kernel_clone);
     unregister_kprobe(&kp_finish_task_switch);
+    /*
     #if LINUX_VERSION_CODE >= KERNEL_VERSION(6,0,0)
     unregister_kprobe(&kp_finish_task_switch_cold);
     #endif
-
+    */
+    
     dprint_info_test("%s: [MODULE INFO TEST] [%d] Do exit UNregister pointer %lx\n",
     MOD_NAME,
     current->pid,
@@ -1011,6 +1023,7 @@ void my_spurious_handler(struct pt_regs *regs){
             current->pid,
             (void *)regs->ip);
 
+        
         dprint_info_hook("%s: [MY SPURIOUS HOOK] [%d] The address from which the metadata for the call is present is equal to%px\n",
             MOD_NAME,
             current->pid,
@@ -1095,6 +1108,12 @@ void my_spurious_handler(struct pt_regs *regs){
             ret);
             kill_process();
         }
+
+        /* pr_info("%s: [MY SPURIOUS HOOK] [%d] AAAAAAAAAAAAAAAAAA %px \n", */
+        /*         MOD_NAME, */
+        /*         current->pid, */
+        /*         (void *)ip_addr */
+                /* ); */
 
         dprint_info_hook("%s: [MY SPURIOUS HOOK] [%d] The absolute address of the function to which the kernel will pass the control is%px\n",
             MOD_NAME,

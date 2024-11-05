@@ -570,11 +570,11 @@ int single_address(stack_item* top_stack, unsigned long user_stack_address, unsi
             }
         }
 
-#ifdef DEBUG_CHECK_RETURN_ADDRESS
+/* #ifdef DEBUG_CHECK_RETURN_ADDRESS */
         pr_info("%s: [CHECK ALL RETURN ADDRESS] Return address on the Kernel Stack %px\n", MOD_NAME, (void *)ret_addr_kernel);
         pr_info("%s: [CHECK ALL RETURN ADDRESS] Return address on the user stack %px\n", MOD_NAME, (void *)ret_addr_user);
         pr_info("%s: [CHECK ALL RETURN ADDRESS] User stack position %px\n", MOD_NAME, (void *)user_stack_address_kernel);
-#endif
+/* #endif */
 
         /*
          * I check if the return address on the user stack has been changed abnormally.In this case, yes
@@ -986,6 +986,9 @@ int iter_block_address(stack_item* top_stack, unsigned long user_stack_address, 
             /* Recovery the corresponding actual return address on the user stack to be validated */
             curr_pointer = (unsigned long *)(sm->copy_stack_user + (user_stack_address_kernel - start));
 
+            /* pr_info("%s: [CHECK ALL RETURN ADDRESS] Return address on the Kernel Stack %px\n", MOD_NAME, (void *)ret_addr_kernel); */
+            /* pr_info("%s: [CHECK ALL RETURN ADDRESS] Return address on the user stack %px\n", MOD_NAME, (void *)((curr_pointer)[0])); */
+            /* pr_info("%s: [CHECK ALL RETURN ADDRESS] User stack position %px\n", MOD_NAME, (void *)user_stack_address_kernel); */
             /* Comparison the expected return address with the actual return address*/
             if((void *)((curr_pointer)[0]) != (void *)ret_addr_kernel) {
 
@@ -1090,7 +1093,6 @@ int check_all_return_adress(stack_item* top_stack, unsigned long user_stack_addr
 #endif
 
     int suc_counter;
-
 
 #ifdef SINGLE_ADDRESS_ONE_COPY_FROM_USER
 #ifdef LOG_SYSTEM

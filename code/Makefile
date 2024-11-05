@@ -3,7 +3,7 @@ LOADER_PATH := ./Loader
 LOADER_EXE := $(LOADER_PATH)/Kss_loader
 COMMON_FLAGS = -I ./Loader/include/ -Wall -Werror -pedantic -std=gnu99
 LOADER_EXTRA_FLAGS =
-KSS_EXTRA_CFLAGS = 
+KSS_EXTRA_CFLAGS =
 
 # default def
 CFU := 1

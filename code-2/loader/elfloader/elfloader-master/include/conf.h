@@ -2,7 +2,7 @@
 #define CONF_H
 
 
-#define LOG_SYSTEM          // log action 
+//#define LOG_SYSTEM          // log action 
 #define RAND_PERC           // randomic percentage use only if random subset
 
 //use one of this two

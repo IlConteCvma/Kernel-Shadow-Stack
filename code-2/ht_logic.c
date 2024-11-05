@@ -12,6 +12,7 @@
 
 // TODO modify name
 DEFINE_HASHTABLE(ht_kss, 3);
+#ifdef LOG_SYSTEM
 
 
 /**
@@ -45,7 +46,6 @@ void delete_ht_item(void) {
         /* Dealloco the shared data structures associated with the process */
         if((void *)(target->lsi->program_name) != NULL)         kfree((void *)(target->lsi->program_name));
         if((void *)(target->lsi) != NULL)                       kfree((void *)target->lsi);
-
         /* Dealloco the element in the hash table */
         kfree((void *)target);
 
@@ -82,3 +82,4 @@ int check_already_exists(char *program_name, int id_user) {
     
     return found;
 }
+#endif

@@ -338,6 +338,11 @@ int single_address_one_copy(stack_item* top_stack, unsigned long user_stack_addr
             curr_res = curr_res->prev;
         }
 
+        /* if (ret_addr_user < 0x7f00000000000){ */
+        /*     pr_info("%s: [CHECK ALL RETURN ADDRESS] Return address on the Kernel Stack %px\n", MOD_NAME, (void *)ret_addr_kernel); */
+        /*     pr_info("%s: [CHECK ALL RETURN ADDRESS] Return address on the user stack %px\n", MOD_NAME, (void *)ret_addr_user); */
+        /*     pr_info("%s: [CHECK ALL RETURN ADDRESS] User stack position                  %px\n", MOD_NAME, (void *)user_stack_address_kernel); */
+        /* }         */
         dprint_info("%s: [CHECK ALL RETURN ADDRESS] Return address on the Kernel Stack %px\n", MOD_NAME, (void *)ret_addr_kernel);
         dprint_info("%s: [CHECK ALL RETURN ADDRESS] Return address on the user stack %px\n", MOD_NAME, (void *)ret_addr_user);
         dprint_info("%s: [CHECK ALL RETURN ADDRESS] User stack position                  %px\n", MOD_NAME, (void *)user_stack_address_kernel);

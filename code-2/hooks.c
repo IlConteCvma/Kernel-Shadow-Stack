@@ -1369,12 +1369,12 @@ int install_kprobes(void) {
         return 0;
     }
     
-    #if LINUX_VERSION_CODE >= KERNEL_VERSION(6,0,0)
+    #if LINUX_VERSION_CODE >= KERNEL_VERSION(7,0,0) // @Pasquale: i disabled this because it didnt work, hope it doesnt brak anything
     ret = register_kprobe(&kp_finish_task_switch_cold);
 
     if(ret < 0) {
         unregister_kprobe(&kp_finish_task_switch);
-        pr_err("%s: [ERROR MODULE INIT] [INSTALLATION KPROBE] [%d] Error in the recording of the KPROBE #2 on 'finish_task_switch()' %d \n",
+        pr_err("%s: [ERROR MODULE INIT] [INSTALLATION KPROBE] [%d] Error in the recording of the KPROBE #2 on 'finish_task_switch() cold' %d \n",
         MOD_NAME,
         current->pid,
         ret);

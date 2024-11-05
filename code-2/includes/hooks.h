@@ -8,6 +8,7 @@
 #define do_exit_func                 "do_exit"
 #define kallsyms_lookup_name_func    "kallsyms_lookup_name"
 #define finish_task_switch_func      "finish_task_switch.isra.0"
+//#define finish_task_switch_func      "finish_task_switch"
 #define finish_task_switch_cold_func "finish_task_switch.isra.0.cold"
 #define kernel_clone_func            "kernel_clone"
 

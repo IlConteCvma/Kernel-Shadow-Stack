@@ -9,7 +9,7 @@ const char *workqueue_name = "workqueue_kss";
 
 /* Workqueue for the asynchronous writing of events and the portion of corrupt user stack on log files */
 struct workqueue_struct *wq;
-#endif
+
 
 /**
  * Flush_buffer_log - It is performed by the Kernel Worker Daemon to bring events back to files
@@ -72,7 +72,6 @@ void flush_buffer_log(unsigned long data) {
         free_pages((unsigned long)buffer_log, ORDER);
     }
 }
-
 
 
 /**
@@ -600,3 +599,4 @@ int write_no_call_event_to_log_buffer(unsigned long ret_instr_addr,
 
     return 0;
 }
+#endif
