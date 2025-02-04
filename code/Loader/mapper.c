@@ -33,20 +33,29 @@ char dir_path_call[256] = {0};
 /*Absolute path of the directory containing the instrumentation information for the RET */
 char dir_path_ret[256] = {0};
 
+
+
 /* Information needed to perform the institution of the program to be launched         */
 instrum_param param;
 
 int is_interp_global;
+
+/* Number of call instructions in the program to be launched that must be instructed*/                   
+unsigned int num_istr_call;
+
+/* Number of Ret instructions in the program to be launched that must be instructed */                                    
+unsigned int num_istr_ret;
 // ---------------------------------------------------------------------- 
 
 
 /*
- * Init_path - Initialize the absolute paths used by the Loader Elf to obtain the information
-* necessary to instruct the new executable to be launched.
+ * Init_path - Initialize the absolute paths used by the Loader Elf to obtain the informations
+* necessary to instruct the new executable to be launched, and retrive them.
 *
 * @path_instr_info: Absolute path of the directory containing the instrument information
 */
 void init_path(char *path_instr_info) {
+    FILE *file = NULL;
 
     /* Settagio percorso assoluto del file contenente il numero delle istruzioni di CALL */
     strcpy(file_path_number_call, path_instr_info);
@@ -69,6 +78,42 @@ void init_path(char *path_instr_info) {
     dprint("[Initialisation paths] Absolute path of the folder containing the files with the offset of the call instructions: %s\n", dir_path_call);
     dprint("[Initialisation paths] Absolute path of the folder containing the files with the offset of the Ret instructions: %s\n", dir_path_ret);
 
+    //kss files
+    /* Recovery the total number of Ret instructions */
+    file = fopen(file_path_number_ret, "r");
+
+    if(file == NULL) {
+        perror("[ERROR ELF MAP] File opening error for reading the total number of Ret instructions\n");
+        exit(EXIT_FAILURE);
+    }
+
+    ret = fscanf(file, "%u", &num_istr_ret);
+
+    if(ret != 1) {
+        printf("[ERROR ELF MAP] Reading the Ret Instructions number of instructions\n");
+        exit(EXIT_FAILURE);
+    }
+
+    fclose(file);
+    dprint("[ELF MAP] Total number of Ret instructions: %d\n", num_istr_ret);
+
+    /* recovery The Total Number Of Call Instructions */                
+    file = fopen(file_path_number_call, "r");
+
+    if(file == NULL) {
+        perror("[ERROR ELF MAP] Errore apertura file per la lettura del numero totale di istruzioni di CALL\n");
+        exit(EXIT_FAILURE);
+    }
+
+    ret = fscanf(file, "%u", &num_istr_call);
+
+    if(ret != 1) {
+        printf("[ERROR ELF MAP] Errore nella lettura del numero di istruzioni di CALL\n");
+        exit(EXIT_FAILURE);
+    }
+    dprint("[ELF MAP] Total number of call instructions: %d\n", num_istr_call);
+    fclose(file);
+
 }
 
 
@@ -90,20 +135,9 @@ void map(unsigned char *data, struct elf_info *md, int is_interp, char *path_ins
 
     size_t virtual_offset = 0, total_to_map = 0, success = 0;
     unsigned char *mapping = MAP_FAILED;
-
-    int ret;
-    FILE *file = NULL;
-
-
-
+ 
     /* Identifies the type of executable ELF with which we are dealing with                     */
     int et_dyn;
-
-    /* Number of call instructions in the program to be launched that must be instructed*/                   
-    unsigned int num_istr_call;
-
-    /* Number of Ret instructions in the program to be launched that must be instructed */                                    
-    unsigned int num_istr_ret;
 
     /* Pointer to the new memory area containing the information to instruct the calls*/                        
     struct instru_call_info *new_mapp_area = NULL;
@@ -149,42 +183,6 @@ void map(unsigned char *data, struct elf_info *md, int is_interp, char *path_ins
         return;
     }
 
-
-    //kss files
-    /* Recovery the total number of Ret instructions */
-    file = fopen(file_path_number_ret, "r");
-
-    if(file == NULL) {
-        perror("[ERROR ELF MAP] File opening error for reading the total number of Ret instructions\n");
-        exit(EXIT_FAILURE);
-    }
-
-    ret = fscanf(file, "%u", &num_istr_ret);
-
-    if(ret != 1) {
-        printf("[ERROR ELF MAP] Reading the Ret Instructions number of instructions\n");
-        exit(EXIT_FAILURE);
-    }
-
-    fclose(file);
-    dprint("[ELF MAP] Total number of Ret instructions: %d\n", num_istr_ret);
-
-    /* recovery The Total Number Of Call Instructions */                
-    file = fopen(file_path_number_call, "r");
-
-    if(file == NULL) {
-        perror("[ERROR ELF MAP] Errore apertura file per la lettura del numero totale di istruzioni di CALL\n");
-        exit(EXIT_FAILURE);
-    }
-
-    ret = fscanf(file, "%u", &num_istr_call);
-
-    if(ret != 1) {
-        printf("[ERROR ELF MAP] Errore nella lettura del numero di istruzioni di CALL\n");
-        exit(EXIT_FAILURE);
-    }
-    dprint("[ELF MAP] Total number of call instructions: %d\n", num_istr_call);
-    fclose(file);
     if(num_istr_call == 0) goto no_call_istr; 
 
     /*
@@ -193,7 +191,6 @@ void map(unsigned char *data, struct elf_info *md, int is_interp, char *path_ins
     * In order to make the most of the offset of JMP's education that will replace the call.
     */
 
-   //TODO control this part
     new_mapp_area = (struct instru_call_info *)mmap(mapping - PAGE_CEIL(sizeof(struct instru_call_info) * num_istr_call),
                         PAGE_CEIL(sizeof(struct instru_call_info) * num_istr_call),
                         PROT_WRITE | PROT_EXEC | PROT_READ,
@@ -376,8 +373,6 @@ size_t map_segments(unsigned char *mapping, unsigned char *data, ElfW(Phdr) *phd
             item = item->next;
 
         }
-
-        
 
         do_instrumentation(&param);
 
