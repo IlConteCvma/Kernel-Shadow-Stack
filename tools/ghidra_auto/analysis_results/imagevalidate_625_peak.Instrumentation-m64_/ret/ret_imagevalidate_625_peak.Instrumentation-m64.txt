@@ -1,0 +1,4 @@
+17fe,1,0,init_targa
+1a59,1,1,dump_header
+433f,1,2,spec_strdup
+4d91,1,3,load_image_file

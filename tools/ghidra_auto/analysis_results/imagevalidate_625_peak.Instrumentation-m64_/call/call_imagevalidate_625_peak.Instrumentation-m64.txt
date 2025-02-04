@@ -1,0 +1,14 @@
+3fa4,1,0,init_targa
+40bb,1,0,init_targa
+4216,1,0,init_targa
+4002,1,1,dump_header
+4015,1,1,dump_header
+1e33,1,2,spec_strdup
+1e66,1,2,spec_strdup
+2053,1,2,spec_strdup
+2f35,1,2,spec_strdup
+300d,1,2,spec_strdup
+3e6c,1,2,spec_strdup
+4369,1,2,spec_strdup
+2216,1,3,load_image_file
+2272,1,3,load_image_file

@@ -1,0 +1,9 @@
+﻿Test_name,connection_time_avg,Min Value,Q1 Value,Median (Q2),Q3 Value,Max Value,connection_time_stddev
+Large-100-instru,0.4,0.3,0.3325,0.5,0.4675,0.8,0.1
+Large-200-instru,0.3,0.3,0.2325,0.5,0.3675,0.5,0.1
+Medium-100-instru,0.5,0.3,0.23,0.5,0.77,3.6,0.4
+Medium-200-instru,0.4,0.3,0.3325,0.5,0.4675,0.7,0.1
+Small-100-instru,0.4,0.3,0.3325,0.5,0.4675,0.5,0.1
+Small-200-instru,0.3,0.3,0.2325,0.5,0.3675,1.7,0.1
+Dynamic-100-instru,99.4,86.9,93.19,97.5,105.61,123.7,9.2
+Dynamic-200-instru,106.4,91.5,98.435,104.5,114.365,178.7,11.8
