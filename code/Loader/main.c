@@ -1,5 +1,13 @@
 #include "include/include.h"
 
+#ifdef LOG_SYSTEM
+    int id_user;
+    char *input_file;
+#endif
+
+#ifdef RAND_PERC
+    int perc;
+#endif 
 
 int main(int argc, char **argv) {
     /*
@@ -16,12 +24,8 @@ int main(int argc, char **argv) {
 */
 
     int fd;
-#ifdef LOG_SYSTEM
-    int id_user;
-#endif
 	struct stat statbuf;
 	unsigned char *elf = NULL;
-
     int max_argc;
 
 #ifdef LOG_SYSTEM
@@ -60,11 +64,32 @@ int main(int argc, char **argv) {
         return 1;
     }
 
+    #ifdef RAND_PERC
+        input_file = argv[4];
+        perc = atoi(argv[3]);
+        if(perc == 0 || perc < 0 || perc > 100) {
+            printf("[ERROR REFLECT EXECVES] Percentage error of functions to be made in the instrustment randomly: %d\n", perc);
+            exit(EXIT_FAILURE);
+        }
+    #else
+        input_file = argv[3];
+    #endif
+
 #endif //LOG_SYSTEM
 
     /* Opening of the new file that must be uploaded and launched by the Loader Elf  */
     // last element passed in argv
+    
+    #ifdef RAND_PERC
+        input_file = argv[3];
+        perc = atoi(argv[2]);
+        if(perc == 0 || perc < 0 || perc > 100) {
+            printf("[ERROR REFLECT EXECVES] Percentage error of functions to be made in the instrustment randomly: %d\n", perc);
+            exit(EXIT_FAILURE);
+        }
+    #endif
 
+    input_file = argv[2];
     fd = open(argv[max_argc-1], O_RDONLY);
     if(fd == -1) {
         printf("[ERROR MAIN] Error in opening the file %s: %s\n", argv[max_argc-1], strerror(errno));

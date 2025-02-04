@@ -17,10 +17,9 @@
 #define PAGE_FLOOR(addr) ((addr) & (-PAGE_SIZE))                // Lower bound to page size
 #define PAGE_CEIL(addr) (PAGE_FLOOR((addr) + PAGE_SIZE - 1))    // Upper bound to page size
 
+// ---------------------------------------------------------------------- 
 /* List of the list of the list containing the information on the segments of the executable */
 info_seg * info_seg_head = NULL;
-
-
 
 /* Absolute path of the file containing the number of calls to be made up*/
 char file_path_number_call[256] = {0};
@@ -38,7 +37,7 @@ char dir_path_ret[256] = {0};
 instrum_param param;
 
 int is_interp_global;
-
+// ---------------------------------------------------------------------- 
 
 
 /*
@@ -83,19 +82,8 @@ bool is_compatible_elf(const ElfW(Ehdr) *ehdr) {
             ehdr->e_ident[EI_DATA] == ELFDATA_NATIVE);
 }
 
-#ifdef LOG_SYSTEM
-    #ifdef RAND_PERC
-    void map(unsigned char *data, struct elf_info *md, int is_interp, char *path_instr_info, char *input_file, int id_user, int perc)
-    #else
-    void map(unsigned char *data, struct elf_info *md, int is_interp, char *path_instr_info, char *input_file, int id_user)
-    #endif
-#else
-    #ifdef RAND_PERC
-    void map(unsigned char *data, struct elf_info *md, int is_interp, char *path_instr_info, int perc)
-    #else
-    void map(unsigned char *data, struct elf_info *md, int is_interp, char *path_instr_info)
-    #endif
-#endif
+
+void map(unsigned char *data, struct elf_info *md, int is_interp, char *path_instr_info)
 {
     ElfW(Ehdr) *ehdr;
     ElfW(Phdr) *phdr;
