@@ -56,6 +56,7 @@ unsigned int num_istr_ret;
 */
 void init_path(char *path_instr_info) {
     FILE *file = NULL;
+    int ret;
 
     /* Settagio percorso assoluto del file contenente il numero delle istruzioni di CALL */
     strcpy(file_path_number_call, path_instr_info);

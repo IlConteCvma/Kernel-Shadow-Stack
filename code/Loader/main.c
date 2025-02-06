@@ -1,8 +1,10 @@
 #include "include/include.h"
 
+
+char *input_file;
+
 #ifdef LOG_SYSTEM
     int id_user;
-    char *input_file;
 #endif
 
 #ifdef RAND_PERC
