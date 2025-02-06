@@ -44,8 +44,8 @@ void do_instrumentation(instrum_param* param) {
 #endif
 
     struct ioctl_data *my_ioctl_data;           /* User Space Instruments Map                                       */
-    unsigned long start_text;                   /* Beginning of the section .text                                                  */
-    unsigned long end_text;                     /* End of the section .text                                                    */
+    unsigned long start_text;                   /* Beginning of the section .text                                   */
+    unsigned long end_text;                     /* End of the section .text                                         */
 
 #ifdef RANDOM_SUBSET_FUNC
     /* Pointer at the first element of the list containing the indexes of the functions to be made up randomly generated. */
