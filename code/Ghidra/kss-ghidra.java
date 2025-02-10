@@ -40,7 +40,7 @@ public class GetRetCallWithLabel extends GhidraScript {
 
     int num_call_in = 0;
 	//TODO
-    String path_base = "/home/marco/kss-test/";
+    String path_base = "/path/kss-test/";
     /* L'i-esimo elemento delle tre liste successive contiene le informazioni relative ad una stessa funzione */
 
     /* Lista contenente gli indirizzi di tutte le RET per ogni funzione di interesse */
