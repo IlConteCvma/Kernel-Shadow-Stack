@@ -60,7 +60,7 @@ extern int size_suc    ; //in driver-core.c
 #include <linux/timekeeping.h>
 #include <linux/fs.h>
 
-#define FILENAME "/tmp/kernel_output.csv"
+#define FILENAME "/home/user/Desktop/kernel_output.csv"
 
 struct timestats {
     pid_t pid;

@@ -6,11 +6,14 @@
 #include "includes/logging.h"
 
 
+//TODO: REMOVE start
 #ifdef GET_HOOKS_STATS
 
 LIST_HEAD(list_of_timestamps);
 
+
 #endif
+//TODO REMOVE end
 
 
 
@@ -75,7 +78,14 @@ struct kprobe kp_do_exit = {
 int install_kprobes(void) {
     int ret;
 
+    #ifdef GET_HOOKS_STATS
 
+    pr_err("%s: [ STARTING ] [GET HOOKS] [%d] GET HOOKS STATS IS ON\n",
+        MOD_NAME,
+        current->pid);
+
+
+    #endif
     /* Install the proe kernels on the finish_task_switch() */
     ret = register_kprobe(&kp_finish_task_switch);
 
@@ -408,6 +418,37 @@ int hook_do_exit(struct kprobe *p, struct pt_regs *regs) {
     /* I check if the current thread is part of our security architecture to dealut resources */
 
     if(check_integrity_security_metadata(end_of_stack)) {
+
+        //TODO: REMOVE start
+
+        #ifdef GET_HOOKS_STATS
+        pr_err("%s: [ CLOSING ] [GET HOOKS] [%d] GET HOOKS STATS IS closing and save data\n",
+            MOD_NAME,
+            current->pid);
+        
+        //print list 
+        struct file* info_file = NULL;
+        char buffer[256];  // Buffer to hold CSV line
+        int to_write,len;
+        struct list_head *pos;
+        struct timestats *current_node;
+        info_file = filp_open(FILENAME, O_CREAT | O_WRONLY | O_APPEND, S_IRWXU | S_IRWXG| S_IRWXO);
+        
+        list_for_each(pos, &list_of_timestamps) {
+            current_node = list_entry(pos, struct timestats, list);
+            len = snprintf(buffer, sizeof(buffer), "%d,%d,%llu\n", current_node->pid, current_node->type, current_node->timestamp);
+            to_write = kernel_write(info_file, buffer, len,&info_file->f_pos);
+            
+        }
+
+        filp_close(info_file, NULL);
+        pr_info("%s: [PID EXIT] [%d] Saving stats for the pid...\n",
+            MOD_NAME,
+            current->pid);
+        #endif
+
+        //TODO: REMOVE end
+
         dprint_info_hook("%s: [KPROBE do_exit()] [%d] MATCHING Application name --> A thread is ending "
                "della mia architettura\n", MOD_NAME, current->pid);
 
@@ -528,29 +569,9 @@ next_step_exit:
             }
 
 
-            //TODO: REMOVE start
-
-            #ifdef GET_HOOKS_STATS
             
-            //print list 
-            struct file* info_file = NULL;
-            char buffer[256];  // Buffer to hold CSV line
-            int to_write,len;
-            struct list_head *pos;
-            struct timestats *current_node;
-            info_file = filp_open(FILENAME, O_CREAT | O_WRONLY | O_APPEND, S_IRWXU | S_IRWXG| S_IRWXO);
 
-            list_for_each(pos, &list_of_timestamps) {
-                current_node = list_entry(pos, struct timestats, list);
-                len = snprintf(buffer, sizeof(buffer), "%d,%d,%llu\n", current_node->pid, current_node->type, current_node->timestamp);
-                to_write = kernel_write(info_file, buffer, len,&info_file->f_pos);
-                
-            }
-
-            filp_close(info_file, NULL);
-            #endif
-
-            //TODO: REMOVE end
+            
         }
 
         kfree((void *)sm);
@@ -752,7 +773,7 @@ void my_invalid_op_handler(struct pt_regs *regs) {
         //TODO: no checks to return (don't fail please)
         element1->pid = current->pid;
         element1->type = 1;
-        element1->timestamp = ktime_get_seconds();
+        element1->timestamp = ktime_get_ns();
 
         list_add_tail(&element1->list, &list_of_timestamps);
 
@@ -1196,8 +1217,8 @@ void my_spurious_handler(struct pt_regs *regs){
         element1 = kmalloc(sizeof(struct timestats), GFP_KERNEL);
         //TODO: no checks to return (don't fail please)
         element1->pid = current->pid;
-        element1->type = 1;
-        element1->timestamp = ktime_get_seconds();
+        element1->type = 0;
+        element1->timestamp = ktime_get_ns();
 
         list_add_tail(&element1->list, &list_of_timestamps);
 
