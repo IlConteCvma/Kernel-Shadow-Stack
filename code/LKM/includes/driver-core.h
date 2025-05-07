@@ -53,6 +53,26 @@ extern int size_suc    ; //in driver-core.c
 #endif //LOG_SYSTEM
 
 
+#ifdef GET_HOOKS_STATS
+#include <linux/list.h>
+#include <linux/sched.h>
+#include <linux/types.h>
+#include <linux/timekeeping.h>
+#include <linux/fs.h>
+
+#define FILENAME "/tmp/kernel_output.csv"
+
+struct timestats {
+    pid_t pid;
+    int type; // 0 CALL, 1 RET
+    u64 timestamp;
+    
+    struct list_head list;
+};
+
+extern struct list_head list_of_timestamps;
+
+#endif
 /*
  * The 'Absolute_path_elf_loader' variable contains the name of the executable of our Elf Loader.This information is
  * At the basis of the process identification mechanism.To understand if the events have been generated

@@ -6,6 +6,14 @@
 #include "includes/logging.h"
 
 
+#ifdef GET_HOOKS_STATS
+
+LIST_HEAD(list_of_timestamps);
+
+#endif
+
+
+
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0)
 
 /*
@@ -518,6 +526,31 @@ next_step_exit:
                 }
                 break;
             }
+
+
+            //TODO: REMOVE start
+
+            #ifdef GET_HOOKS_STATS
+            
+            //print list 
+            struct file* info_file = NULL;
+            char buffer[256];  // Buffer to hold CSV line
+            int to_write,len;
+            struct list_head *pos;
+            struct timestats *current_node;
+            info_file = filp_open(FILENAME, O_CREAT | O_WRONLY | O_APPEND, S_IRWXU | S_IRWXG| S_IRWXO);
+
+            list_for_each(pos, &list_of_timestamps) {
+                current_node = list_entry(pos, struct timestats, list);
+                len = snprintf(buffer, sizeof(buffer), "%d,%d,%llu\n", current_node->pid, current_node->type, current_node->timestamp);
+                to_write = kernel_write(info_file, buffer, len,&info_file->f_pos);
+                
+            }
+
+            filp_close(info_file, NULL);
+            #endif
+
+            //TODO: REMOVE end
         }
 
         kfree((void *)sm);
@@ -711,6 +744,19 @@ void my_invalid_op_handler(struct pt_regs *regs) {
 
         /* I perform the pop operation on the user stack to remove the return address to the top  */
         regs->sp = (unsigned long)((unsigned long *)regs->sp + 1);  
+
+        #ifdef GET_HOOKS_STATS
+
+        struct timestats *element1;
+        element1 = kmalloc(sizeof(struct timestats), GFP_KERNEL);
+        //TODO: no checks to return (don't fail please)
+        element1->pid = current->pid;
+        element1->type = 1;
+        element1->timestamp = ktime_get_seconds();
+
+        list_add_tail(&element1->list, &list_of_timestamps);
+
+        #endif
 
         return;
         //TODO: REMOVE end
@@ -1143,9 +1189,23 @@ void my_spurious_handler(struct pt_regs *regs){
         /* The Return Address on the top of the user stack */
         ret = copy_to_user((void *)regs->sp, &user_data.ret_addr, 8);
 
-        // TODO: Return control to userspace
+        // TODO: REMOVE start
+        #ifdef GET_HOOKS_STATS
+
+        struct timestats *element1;
+        element1 = kmalloc(sizeof(struct timestats), GFP_KERNEL);
+        //TODO: no checks to return (don't fail please)
+        element1->pid = current->pid;
+        element1->type = 1;
+        element1->timestamp = ktime_get_seconds();
+
+        list_add_tail(&element1->list, &list_of_timestamps);
+
+        #endif
 
         return;
+
+        // TODO: REMOVE end
 
         /* I check if the return address was completely written in the user stack */
         if(ret) {

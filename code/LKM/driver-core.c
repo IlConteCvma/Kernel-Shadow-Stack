@@ -48,6 +48,7 @@ struct proc_ops proc_fops = {
   .proc_ioctl = my_ioctl
 };
 
+
 module_init(kss_module_init);
 module_exit(kss_module_exit);
 

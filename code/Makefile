@@ -75,6 +75,9 @@ endif
 ifdef KILL_PROCESS_CALL #if kss get a no call instruction to monitored adress
    KSS_EXTRA_CFLAGS+=-DKILL_PROCESS_NO_CALL
 endif
+ifdef GET_HOOKS_STATS #if kss get a no call instruction to monitored adress
+   KSS_EXTRA_CFLAGS+=-DGET_HOOKS_STATS
+endif
 
 
 
@@ -90,7 +93,8 @@ loader:
 	gcc $(COMMON_FLAGS) $(LOADER_EXTRA_FLAGS) $(LOADER_SOURCE_FILES) -o $(LOADER_EXE)
 
 
-clean clear:
+#clean clear:
+clean:
 	rm -f $(LOADER_EXE)
 	make -I $(LKM_PATH)/includes -C $(KDIR) M=$(PWD) clean
 
