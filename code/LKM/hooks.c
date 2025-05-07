@@ -704,6 +704,17 @@ void my_invalid_op_handler(struct pt_regs *regs) {
             kill_process();
         }
 
+        //TODO: REMOVE start
+        ret = copy_from_user(&ret_addr_user, (unsigned char *)regs->sp, 8);
+        /* I continue correctly the execution of the program once you return to the user level*/
+        regs->ip = ret_addr_user;
+
+        /* I perform the pop operation on the user stack to remove the return address to the top  */
+        regs->sp = (unsigned long)((unsigned long *)regs->sp + 1);  
+
+        return;
+        //TODO: REMOVE end
+
         /*
          * At this point, I have the correct information between the safety metadata to simulate the ret
          * Current and the simulation of the current Ret was actually requested by the Elf Loader.Must
@@ -988,8 +999,10 @@ void my_spurious_handler(struct pt_regs *regs){
     int ret;
     char buf[256] = {0};
     char *absolute_path;
-    unsigned long ip_addr;
-    unsigned long ret_addr;
+    struct {
+        unsigned long ip_addr;
+        unsigned long ret_addr;
+    } __attribute__((packed)) user_data;
     unsigned long *end_of_stack;
     security_metadata *sm;
     stack_item *si;
@@ -1067,6 +1080,9 @@ void my_spurious_handler(struct pt_regs *regs){
             kill_process();
         }
 
+        
+
+
         /* When I arrived here I know that the request is legitimate and the Kernel level stack has been allocated */
 
         /*
@@ -1077,37 +1093,18 @@ void my_spurious_handler(struct pt_regs *regs){
          * A control over the validity of the Return Address.
          */
 
-        ret = copy_from_user(&ret_addr, ((unsigned char *)regs->ip + 14), 8);
-
-        if(ret) {
-            pr_err("%s: [ERROR MY SPURIOUS HOOK] [%d] Error in the recovery of the Return Address [byte Unread --> %d]\n",
-            MOD_NAME,
-            current->pid,
-            ret);
-            kill_process();
-        }
-
-        dprint_info_hook("%s: [MY SPURIOUS HOOK] [%d]The return address that must be saved on the user stack and on the Kernel Stack is%px\n",
-            MOD_NAME,
-            current->pid,
-            (void *)ret_addr);
-
-         /*
-         * Recovery the absolute address of the function to which the kernel will have to pass control.This
-         * address was stored in the new memory region allocated by the Loader Elf and will be used
-         * To update the COCS-> IP so that on the return in user mode it will be divided with the execution
-         * from the target function required.
-         */
-
-        ret = copy_from_user((void *)&ip_addr, (void *)((unsigned char *)regs->ip + 6), 8);
-
-        if(ret) {
-            pr_err("%s: [ERROR MY SPURIOUS HOOK] [%d] Error in recovering the address of the function to pass to control[byte Unread --> %d]\n",
-            MOD_NAME,
-            current->pid,
-            ret);
-            kill_process();
-        }
+         ret = copy_from_user(&user_data, (void __user *)((unsigned char *)regs->ip + 6), sizeof(user_data));
+         if (ret) {
+             pr_err("%s: [ERROR] [%d] Failed to copy IP and return address (unread bytes: %d)\n",
+                    MOD_NAME, current->pid, ret);
+             kill_process();
+             return;
+         }
+     
+         dprint_info_hook("%s: [%d] Target function address: %px, Return address: %px\n",
+                          MOD_NAME, current->pid,
+                          (void *)user_data.ip_addr,
+                          (void *)user_data.ret_addr);
 
         /* pr_info("%s: [MY SPURIOUS HOOK] [%d] AAAAAAAAAAAAAAAAAA %px \n", */
         /*         MOD_NAME, */
@@ -1118,10 +1115,10 @@ void my_spurious_handler(struct pt_regs *regs){
         dprint_info_hook("%s: [MY SPURIOUS HOOK] [%d] The absolute address of the function to which the kernel will pass the control is%px\n",
             MOD_NAME,
             current->pid,
-            (void *)ip_addr);
+            (void *)user_data.ip_addr);
         
          /* Setto the new value of the Poter's intercitation for when I return to the user level */
-        regs->ip = ip_addr;
+        regs->ip = user_data.ip_addr;
 
         dprint_info_hook("%s: [MY SPURIOUS HOOK] [%d] User execution will resume from the address %px\n",
             MOD_NAME,
@@ -1144,7 +1141,11 @@ void my_spurious_handler(struct pt_regs *regs){
         regs->sp = (unsigned long)((unsigned long *)regs->sp - 1);
 
         /* The Return Address on the top of the user stack */
-        ret = copy_to_user((void *)regs->sp, &ret_addr, 8);
+        ret = copy_to_user((void *)regs->sp, &user_data.ret_addr, 8);
+
+        // TODO: Return control to userspace
+
+        return;
 
         /* I check if the return address was completely written in the user stack */
         if(ret) {
@@ -1164,7 +1165,7 @@ void my_spurious_handler(struct pt_regs *regs){
             MOD_NAME,
             current->pid,
             (void *)regs->sp,
-            (void *)ret_addr);
+            (void *)user_data.ret_addr);
         
          /*
          * At this point, I have to enter the validation information on the top of the new Kernel Stack.The stack
@@ -1185,7 +1186,7 @@ void my_spurious_handler(struct pt_regs *regs){
         }
 
         /*I initial the new stack element by setting the return address and its position in the user stack */
-        si->return_address = ret_addr;
+        si->return_address = user_data.ret_addr;
         si->addr_stack_user = regs->sp;
 
         /*
@@ -1208,7 +1209,7 @@ void my_spurious_handler(struct pt_regs *regs){
 
     #ifdef LOG_SYSTEM
         /*Generates a call type event*/
-        ret = write_call_event_to_log_buffer(ip_addr, ret_addr, sm);
+        ret = write_call_event_to_log_buffer(user_data.ip_addr, user_data.ret_addr, sm);
 
         if(ret) {
             pr_err("%s: [ERROR MY SPURIOUS HOOK] [%d] Error in the recording of the event in the log buffer\n",
