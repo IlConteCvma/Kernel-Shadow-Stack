@@ -12,8 +12,53 @@
 LIST_HEAD(list_of_timestamps);
 
 
+struct exit_work  {
+    struct work_struct work;
+};
+void save_stats_work_func(struct work_struct *work);
+
+
+void save_stats_work_func(struct work_struct *work)
+{
+    pr_err("%s: [ CLOSING ] [GET HOOKS] [%d] GET HOOKS STATS IS closing and save data\n",
+        MOD_NAME,
+        current->pid);
+    struct exit_work *ew = container_of(work, struct exit_work, work);
+    struct file* info_file = NULL;
+    char buffer[256];
+    int to_write, len;
+    struct list_head *pos, *tmp;
+    struct timestats *current_node;
+
+    info_file = filp_open(FILENAME, O_CREAT | O_WRONLY | O_APPEND, S_IRWXU | S_IRWXG | S_IRWXO);
+    if (IS_ERR(info_file)) {
+        pr_err("%s: Failed to open file\n", MOD_NAME);
+        kfree(work);
+        goto out;
+    }
+
+    list_for_each_safe(pos, tmp, &list_of_timestamps) {
+        current_node = list_entry(pos, struct timestats, list);
+        len = snprintf(buffer, sizeof(buffer), "%d,%d,%llu\n",
+                       current_node->pid, current_node->type, current_node->timestamp);
+        to_write = kernel_write(info_file, buffer, len, &info_file->f_pos);
+
+        list_del(pos);
+        kfree(current_node);
+    }
+
+    filp_close(info_file, NULL);
+
+    pr_info("%s: [PID EXIT] [%d] Saving stats for the pid...\n",
+            MOD_NAME,
+            current->pid);
+
+    out:
+    kfree(ew);
+}
+
 #endif
-//TODO REMOVE end
+//TODO: REMOVE end
 
 
 
@@ -78,14 +123,16 @@ struct kprobe kp_do_exit = {
 int install_kprobes(void) {
     int ret;
 
+    //TODO: REMOVE start
     #ifdef GET_HOOKS_STATS
 
     pr_err("%s: [ STARTING ] [GET HOOKS] [%d] GET HOOKS STATS IS ON\n",
         MOD_NAME,
         current->pid);
 
-
     #endif
+
+
     /* Install the proe kernels on the finish_task_switch() */
     ret = register_kprobe(&kp_finish_task_switch);
 
@@ -422,29 +469,17 @@ int hook_do_exit(struct kprobe *p, struct pt_regs *regs) {
         //TODO: REMOVE start
 
         #ifdef GET_HOOKS_STATS
-        pr_err("%s: [ CLOSING ] [GET HOOKS] [%d] GET HOOKS STATS IS closing and save data\n",
-            MOD_NAME,
-            current->pid);
         
         //print list 
-        struct file* info_file = NULL;
-        char buffer[256];  // Buffer to hold CSV line
-        int to_write,len;
-        struct list_head *pos;
-        struct timestats *current_node;
-        info_file = filp_open(FILENAME, O_CREAT | O_WRONLY | O_APPEND, S_IRWXU | S_IRWXG| S_IRWXO);
-        
-        list_for_each(pos, &list_of_timestamps) {
-            current_node = list_entry(pos, struct timestats, list);
-            len = snprintf(buffer, sizeof(buffer), "%d,%d,%llu\n", current_node->pid, current_node->type, current_node->timestamp);
-            to_write = kernel_write(info_file, buffer, len,&info_file->f_pos);
-            
+        struct exit_work *ew;
+        ew = kmalloc(sizeof(*ew), GFP_ATOMIC);
+        if (ew)
+        {
+            INIT_WORK(&ew->work, save_stats_work_func);
+            schedule_work(&ew->work);
         }
 
-        filp_close(info_file, NULL);
-        pr_info("%s: [PID EXIT] [%d] Saving stats for the pid...\n",
-            MOD_NAME,
-            current->pid);
+ 
         #endif
 
         //TODO: REMOVE end

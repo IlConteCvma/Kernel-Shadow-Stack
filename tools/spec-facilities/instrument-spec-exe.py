@@ -36,7 +36,7 @@ def copy_file_and_create_instru(file_path):
             file.write('#!/usr/bin/bash\n')
             
             # Write the f-string on the second line
-            file.write(f'/usr/sbin/Kss_loader /home/user/Desktop/ghidra_auto/analysis_results/{file_name}_ {new_file_path} $@')
+            file.write(f'/usr/sbin/Kss_loader /home/user/ghidra_auto/analysis_results/{file_name}_ 100 {new_file_path} $@')
 
             #print(f'Second line : /usr/sbin/Kss_loader /home/user/Desktop/ghidra_auto/analysis_results/{file_name}_ {new_file_path} $@ \n')
             print(f"{file_path} Rewrite complete\n")
@@ -46,10 +46,10 @@ def copy_file_and_create_instru(file_path):
 if __name__ == "__main__":
     # Ensure the script receives exactly one argument (the file path)
     if len(sys.argv) < 2:
-        print("Usage: python script.py <dir_path1> <dir_path2> ... <dir_pathN>")
+        print("Usage: python script.py <bench1> <bench2> ... <benchN>")
         sys.exit(1)
     
-    cost_dir_path = '/home/user/Desktop/spec_cpu/benchspec/CPU'
+    cost_dir_path = '/home/user/spec_cpu/benchspec/CPU'
     cost_exe = 'exe'
 
     for bench in sys.argv[1:]:
