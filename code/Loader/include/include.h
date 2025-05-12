@@ -59,7 +59,7 @@ extern char file_path_number_ret[256];
 extern char dir_path_call[256];
 extern char dir_path_ret[256] ;
 
-void load_and_exec(unsigned char* elf, char **argv, char **env, size_t *stack);
+void load_and_exec(unsigned char* elf, char **argv, char **env, size_t *stack,char *path_instr_info);
 
 
 struct elf_info {

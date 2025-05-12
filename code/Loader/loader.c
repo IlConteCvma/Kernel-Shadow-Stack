@@ -4,7 +4,6 @@
 
 extern char **environ;
 
-
 /**
  * load_and_exec - Construction of the memory view of the new program and its possible interpreter.The
  * Stack setup for the new program and jump to the entry point of the new program.
@@ -16,7 +15,7 @@ extern char **environ;
  */
 /*[ERROR MAIN] path_instr_info id_user perc input_file [arg input_file]*/
 
-void load_and_exec(unsigned char *elf, char **argv, char **env, size_t *stack) {
+void load_and_exec(unsigned char *elf, char **argv, char **env, size_t *stack,char *path_instr_info) {
     int fd;
 
     struct stat statbuf;
@@ -37,7 +36,7 @@ void load_and_exec(unsigned char *elf, char **argv, char **env, size_t *stack) {
     /*Retrive kss instrumentation variable*/
 
     //argv[0] path_instr_info
-    map(elf, &exe, 0, argv[0]);
+    map(elf, &exe, 0, path_instr_info);
 
     if (exe.ehdr == MAP_FAILED) {
         dprint("Unable to map ELF file: %s\n", strerror(errno));
@@ -78,25 +77,43 @@ void load_and_exec(unsigned char *elf, char **argv, char **env, size_t *stack) {
     }
 
     
-#ifdef LOG_SYSTEM
-    #ifdef RAND_PERC
-        argv = argv + 3;
-    #else
-        argv = argv + 2;
-    #endif 
-#else 
-    #ifdef RAND_PERC
-        argv = argv + 2;
-    #else
-        argv = argv + 1;
-    #endif 
-#endif 
+// #ifdef LOG_SYSTEM
+//     #ifdef RAND_PERC
+//         argv = argv + 3;
+//     #else
+//         argv = argv + 2;
+//     #endif 
+// #else 
+//     #ifdef RAND_PERC
+//         argv = argv + 2;
+//     #else
+//         argv = argv + 1;
+//     #endif 
+// #endif 
 
+
+    #ifdef NEW_STACK
+    void *new_stack = mmap(NULL, STACK_SIZE, PROT_READ | PROT_WRITE,
+                MAP_PRIVATE | MAP_ANONYMOUS | MAP_STACK, -1, 0);
+    if (new_stack == MAP_FAILED) {
+        perror("mmap");
+        exit(EXIT_FAILURE);
+    }
+    #endif
     // Count argc
     for (argc = 0; argv[argc]; argc++)
         ;
 
+    dprint("ARGCCC: %ld\n",argc);
+    // for (size_t i = 0; argv[i]; ++i) {
+    //     printf("argv[%zu] = %s\n", i, argv[i]);
+    // }
+    // for (size_t i = 0; env[i]; ++i) {
+    //     printf("env[%zu] = %s\n", i, env[i]);
+    // }
     dprint("Arguments passed: %zu\n", argc);
+
+
     stack_setup(stack, argc, argv, env, NULL,  // AUXV NULL = create syntethic AUXV
                 exe.ehdr, interp.ehdr);
 

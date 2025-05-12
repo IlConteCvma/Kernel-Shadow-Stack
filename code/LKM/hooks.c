@@ -39,8 +39,10 @@ void save_stats_work_func(struct work_struct *work)
 
     list_for_each_safe(pos, tmp, &list_of_timestamps) {
         current_node = list_entry(pos, struct timestats, list);
-        len = snprintf(buffer, sizeof(buffer), "%d,%d,%llu\n",
-                       current_node->pid, current_node->type, current_node->timestamp);
+        len = snprintf(buffer, sizeof(buffer), "%d,%d,%llu,0x%lx,0x%lx,0x%lx\n",
+                       current_node->pid, current_node->type, current_node->timestamp,
+                       current_node->call_addr,current_node->target,
+                       current_node->ret_addr);
         to_write = kernel_write(info_file, buffer, len, &info_file->f_pos);
 
         list_del(pos);
@@ -809,6 +811,10 @@ void my_invalid_op_handler(struct pt_regs *regs) {
         element1->pid = current->pid;
         element1->type = 1;
         element1->timestamp = ktime_get_ns();
+        element1->call_addr = 0;
+        element1->target = ret_addr_user;
+        element1->ret_addr = ret_instr_addr;
+
 
         list_add_tail(&element1->list, &list_of_timestamps);
 
@@ -1254,6 +1260,9 @@ void my_spurious_handler(struct pt_regs *regs){
         element1->pid = current->pid;
         element1->type = 0;
         element1->timestamp = ktime_get_ns();
+        element1->call_addr = call_instr_addr;
+        element1->target = user_data.ip_addr;
+        element1->ret_addr = user_data.ret_addr;
 
         list_add_tail(&element1->list, &list_of_timestamps);
 

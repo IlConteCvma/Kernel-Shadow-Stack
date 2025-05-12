@@ -604,11 +604,11 @@ no_rand:
 
 
                         dprint("[INSTRUMENTAZIONE] [CALL] Valore effettivo della JMP target: %p\tIndirizzo della struttura dati relativa: %p\n", (void *)((unsigned long)&byte[5] + new_operand), (void *)&((param->new_mapp_area)[num_istr_did]));
-                 
+                        dprint("[INSTRUMENTAZIONE] [CALL] Instrumentazione (%d) eseguita con successo\n",num_istr_did);
                         num_istr_did++;
 
 
-                        dprint("[INSTRUMENTAZIONE] [CALL] Instrumentazione eseguita con successo\n");
+                        
                         fflush(stdout);
                     }                   
                     
@@ -776,12 +776,12 @@ no_call_instr:
                         (my_ioctl_data->ret_array)[num_istr_did] = (unsigned long)(&byte[0]);
 
                         dprint("[INSTRUMENTAZIONE] [RET] Offset ret #%d = %lx\n", num_istr_did, (my_ioctl_data->ret_array)[num_istr_did]);
-
+                        dprint("[INSTRUMENTAZIONE] [RET] Instrumentazione (%d) eseguita con successo\n",num_istr_did);
                         num_istr_did++;
 
 
 
-                        dprint("[INSTRUMENTAZIONE] [RET] Instrumentazione eseguita con successo\n");
+                        
                         fflush(stdout);
 
                     }                   

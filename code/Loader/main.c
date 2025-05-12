@@ -115,7 +115,11 @@ int main(int argc, char **argv) {
 	close(fd);
 
     /* Remove extra argv*/
-    load_and_exec(elf, argv + 1, NULL, (size_t *)argv - 1);
+    // load_and_exec(elf, argv + 1, NULL, (size_t *)argv - 1);
+    char **target_argv = &argv[max_argc - 1];
+    // char *env_clean[] = { NULL };
+    // load_and_exec(elf, target_argv, env_clean, (size_t *)argv - 1,argv[1]);
+    load_and_exec(elf, target_argv, NULL, (size_t *)argv - 1,argv[1]);
 
     return 0;
 }

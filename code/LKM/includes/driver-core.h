@@ -66,6 +66,9 @@ struct timestats {
     pid_t pid;
     int type; // 0 CALL, 1 RET
     u64 timestamp;
+    unsigned long call_addr;
+    unsigned long target;
+    unsigned long ret_addr;
     
     struct list_head list;
 };

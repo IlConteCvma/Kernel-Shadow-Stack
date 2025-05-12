@@ -46,6 +46,7 @@ endif
 ifdef WITH_IN
    LOADER_EXTRA_FLAGS+=-DWITH_IN
 endif
+
 ifeq ($(RANDOM),1) # random subset
    LOADER_EXTRA_FLAGS+=-DRANDOM_SUBSET_FUNC
 endif

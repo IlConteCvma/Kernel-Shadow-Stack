@@ -813,7 +813,7 @@ static long my_ioctl(struct file *file, unsigned int cmd, unsigned long arg) {
                 goto map_error_2;
             }
 
-            dprint_info_v("%s: [IOCTL] [%d] Number of CALL = %d\tNumber of RET = %d\n",MOD_NAME, current->pid, my_ioctl_data->call_num, my_ioctl_data->ret_num);
+            dprint_info("%s: [IOCTL] [%d] Number of CALL = %d\tNumber of RET = %d\n",MOD_NAME, current->pid, my_ioctl_data->call_num, my_ioctl_data->ret_num);
             /* Recovery of the memory addresses of the Instructions Int 0xff inserted by the Loader Elf */
             if(my_ioctl_data->call_num == 0) {
                 my_ioctl_data->call_array = NULL;
@@ -850,7 +850,7 @@ static long my_ioctl(struct file *file, unsigned int cmd, unsigned long arg) {
         #ifdef DEBUG
             /* I mold the addresses of the INSTRUCTIONS INST 0XFFS included by the ELF Loader */
             for(i=0; i<my_ioctl_data->call_num; i++) {
-                dprint_info_v("%s: [IOCTL] [%d]Instruction address INT 0xFF #%d: %px\n",
+                dprint_info("%s: [IOCTL] [%d]Instruction address INT 0xFF #%d: %px\n",
                 MOD_NAME,
                 current->pid,
                 i,
@@ -895,7 +895,7 @@ static long my_ioctl(struct file *file, unsigned int cmd, unsigned long arg) {
     #ifdef DEBUG
             /* I mold the addresses of the INSTRUCTIONS INT 0XFF included by the ELF Loader */
             for(i=0; i<my_ioctl_data->ret_num; i++) {
-                dprint_info_v("%s: [IOCTL] [%d] Address of the byte 0x06 #%d: %px\n",
+                dprint_info("%s: [IOCTL] [%d] Address of the byte 0x06 #%d: %px\n",
                 MOD_NAME,
                 current->pid,
                 i,
@@ -904,9 +904,11 @@ static long my_ioctl(struct file *file, unsigned int cmd, unsigned long arg) {
     #endif
 
 no_ret:
-            dprint_info_v("%s: [IOCTL] [%d] The extremes of the instrument area are [%px, %px]\n", MOD_NAME, current->pid,
+            dprint_info("%s: [IOCTL] [%d] The extremes of the instrument area are [%px, %px], call_num(%d),ret_num(%d)\n", MOD_NAME, current->pid,
                 (void *)my_ioctl_data->start_text,  
-                (void *)my_ioctl_data->end_text);
+                (void *)my_ioctl_data->end_text,
+                my_ioctl_data->call_num,
+                my_ioctl_data->ret_num);
             /* Set the pointer to the tentrous map in safety metadata         */
             sm->instrum_map = my_ioctl_data;
         #ifdef LOG_SYSTEM
