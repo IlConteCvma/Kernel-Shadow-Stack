@@ -16,21 +16,28 @@ TESTS = [
     #{'server': 'test-static.com', ,'port': 80, 'num_connections': 1, 'num_requests': 1},
     #Page HTML HUGE
     #{'server': 'test-static.com','uri': 'index.html' ,'port': 80, 'num_connections': 1, 'num_requests': 1},
-    {'name':'Large','server': 'test-static.com','uri': 'index.html' ,'port': 80, 'num_connections': NUM_CONNECT},
+
     #{'server': 'test-static.com','uri': 'index.html' ,'port': 80, 'num_connections': 200, 'num_requests': 2000},
     #Page HTML MEDIUM
     #{'server': '127.0.0.1', 'uri':'index.html' ,'port': 80, 'num_connections': 1, 'num_requests': 1},
-    {'name':'Medium','server': '127.0.0.1', 'uri':'index.html' ,'port': 80, 'num_connections': NUM_CONNECT},
+
     #{'server': '127.0.0.1', 'uri':'index.html' ,'port': 80, 'num_connections': 200, 'num_requests': 2000},
+
     #Page HTML SMALL
     #{'server': 'test-ssmall.com', 'uri': 'index.html' ,'port': 80, 'num_connections': 1, 'num_requests': 1},
-    {'name':'Small','server': 'test-ssmall.com', 'uri': 'index.html' ,'port': 80, 'num_connections': NUM_CONNECT},
+    
     #{'server': 'test-ssmall.com', 'uri': 'index.html' ,'port': 80, 'num_connections': 200, 'num_requests': 2000},
 
     #Dynamic site
     #{'server': 'test-dynamic.com' , 'uri': '/login_user.php?user_email=anindodas@yahoo.in&user_password=anindo', 'port': 80, 'num_connections': 1, 'num_requests': 1},
-    {'name':'Dynamic','server': 'test-dynamic.com' , 'uri': '/login_user.php?user_email=anindodas@yahoo.in&user_password=anindo', 'port': 80, 'num_connections': NUM_CONNECT},
     #{'server': 'test-dynamic.com' , 'uri': '/login_user.php?user_email=anindodas@yahoo.in&user_password=anindo', 'port': 80, 'num_connections': 200, 'num_requests': 2000},
+
+    {'name':'4KB','server': 'test-4KB','uri': 'index.html' ,'port': 80, 'num_connections': NUM_CONNECT},
+    {'name':'10KB','server': '127.0.0.1', 'uri':'index.html' ,'port': 80, 'num_connections': NUM_CONNECT},
+    {'name':'25KB','server': 'test-25KB','uri': 'index.html' ,'port': 80, 'num_connections': NUM_CONNECT},
+    {'name':'2MB','server': 'test-2MB','uri': 'index.html' ,'port': 80, 'num_connections': NUM_CONNECT},
+    {'name':'Dynamic','server': 'test-dynamic' , 'uri': '"/login_user.php?user_email=anindodas@yahoo.in&user_password=anindo"', 'port': 80, 'num_connections': NUM_CONNECT},
+
 
     # Add more test configurations as needed
 ]
@@ -57,9 +64,9 @@ def run_httperf(test):
     #    '-timeout', '1'
     #]
 
-    cmd = f"httperf --server {test['server']} --port {str(test['port'])} --uri {test['uri']} --num-conns {str(test['num_connections'])} --rate 0 --timeout 1"
+    cmd = f"httperf --server {test['server']} --port {str(test['port'])} --uri {test['uri']} --num-conns {str(test['num_connections'])} --rate 0"
     
-    
+    #print(cmd)
     result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True, executable="/bin/bash")
     return result
 

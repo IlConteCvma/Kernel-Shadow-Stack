@@ -79,7 +79,9 @@ endif
 ifdef GET_HOOKS_STATS #if kss get a no call instruction to monitored adress
    KSS_EXTRA_CFLAGS+=-DGET_HOOKS_STATS
 endif
-
+ifdef GET_HOOKS_NUM #if kss get a no call instruction to monitored adress
+   KSS_EXTRA_CFLAGS+=-DGET_HOOKS_NUM
+endif
 
 
 all:

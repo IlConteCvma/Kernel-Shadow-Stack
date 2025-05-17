@@ -21,7 +21,7 @@ times = [0]*NUM_CSV
 
 def print_plot(path):
     colors = ["#03045e", "#023e8a", "#0077b6", "#0096c7", "#00b4d8", "#48cae4", "#90e0ef"]
-    instrumented_path   = os.path.join(path, "instru.csv")
+    instrumented_path   = os.path.join(path, "100-instru.csv")
     notinstru_path      = os.path.join(path, "not-instru.csv")
     instrumented33_path   = os.path.join(path, "33-instru.csv")
     instrumented66_path   = os.path.join(path, "66-instru.csv")
@@ -31,14 +31,14 @@ def print_plot(path):
     times[2] = pd.read_csv(instrumented66_path)
     times[3] = pd.read_csv(instrumented_path)
 
-    test_names = ["Large","Medium","Small","Dynamic"]
+    test_names = ["4KB","10KB","25KB","2MB","Dynamic"]
     #labels = ["Not instrumented","Instrumented (Full)"]
     labels = ["Not instrumented","Instrumented (33%)","Instrumented (66%)","Instrumented (Full)"]
 
-    save_name = f"test_execution_time_2.pdf"
-    graph_title = f"Real-world scenario Test Execution Time"
-    y_name = "Average Execution Time (s)"
-    x_name = "Test Name"
+    save_name = f"test_execution_time.pdf"
+    graph_title = f"Real-world scenario"
+    y_name = "Response Time (s x 1000 req)"
+    x_name = "Configuration"
 
     ys = []
 

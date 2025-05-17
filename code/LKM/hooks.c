@@ -4,6 +4,126 @@
 #include "includes/kss_hashtable.h"
 #include "includes/utils.h"
 #include "includes/logging.h"
+#include <linux/hashtable.h>
+
+#define MY_HASH_BITS 9  // 2^9 = 512 buckets
+
+struct call_cache_node {
+    struct hlist_node hnode;
+    unsigned long call_user_info_addr;
+    unsigned long call_target;
+    unsigned long ret_target;
+};
+
+DEFINE_HASHTABLE(call_cache_table, MY_HASH_BITS);
+
+// Insert a node
+static int insert_node(unsigned long call_user_info_addr, unsigned long call_target, unsigned long ret_target)
+{
+    struct call_cache_node *node;
+
+    node = kmalloc(sizeof(*node), GFP_KERNEL);
+    if (!node)
+        return -ENOMEM;
+
+    node->call_user_info_addr = call_user_info_addr;
+    node->call_target = call_target;
+    node->ret_target = ret_target;
+
+    hash_add(call_cache_table, &node->hnode, call_user_info_addr);
+    return 0;
+}
+
+// Find a node by call_user_info_addr
+static struct call_cache_node *find_node(unsigned long call_user_info_addr)
+{
+    struct call_cache_node *node;
+
+    hash_for_each_possible(call_cache_table, node, hnode, call_user_info_addr) {
+        if (node->call_user_info_addr == call_user_info_addr)
+            return node;
+    }
+
+    return NULL;
+}
+// Clear the hash table
+static void clear_table(void)
+{
+    int bkt;
+    struct call_cache_node *node;
+    struct hlist_node *tmp;
+
+    hash_for_each_safe(call_cache_table, bkt, tmp, node, hnode) {
+        hash_del(&node->hnode);
+        kfree(node);
+    }
+}
+
+
+#ifdef GET_HOOKS_NUM
+#include <linux/limits.h>
+
+unsigned long call_counter = 0;
+unsigned int call_overflow = 0;
+
+unsigned long ret_counter = 0;
+unsigned int ret_overflow = 0;
+
+void increment_counter(unsigned long *counter, unsigned int *overflow)
+{
+    if (*counter == ULONG_MAX) {
+        *counter = 0;
+        (*overflow)++;
+    } else {
+        (*counter)++;
+    }
+}
+
+#define COUNTERS_FILENAME "/home/user/Desktop/hooks_counters.log"
+
+struct exit_work  {
+    struct work_struct work;
+};
+void save_counters_work_func(struct work_struct *work);
+
+void save_counters_work_func(struct work_struct *work)
+{
+    pr_info("%s: [SAVING COUNTERS] Writing facility counters to file for pid [%d]\n", MOD_NAME,current->pid);
+
+    struct exit_work *ew = container_of(work, struct exit_work, work);
+    struct file* stats_file = NULL;
+    char buffer[256];
+    int len, ret;
+
+    // Open the file for writing (append mode)
+    stats_file = filp_open(COUNTERS_FILENAME, O_CREAT | O_WRONLY | O_APPEND, 0644);
+    if (IS_ERR(stats_file)) {
+        pr_err("%s: Failed to open %s\n", MOD_NAME, COUNTERS_FILENAME);
+        kfree(ew);
+        return;
+    }
+
+    // Format the counters into a CSV line
+    len = snprintf(buffer, sizeof(buffer),
+                   "HOOKS NUMBER FOR PID %d (run)\n\tmax counters value: %lu\n\tcall_counter: %lu\n\tcall_overflow: %u\n\tret_counter: %lu\n\tret_overflow: %u\n\tCk\t: %lu\n\tT\t: \n\tFk\t: \n\n",
+                   current->pid, ULONG_MAX,
+                   call_counter,call_overflow,
+                   ret_counter, ret_overflow,
+                   call_counter+ret_counter);
+
+    // Write the buffer to the file
+    ret = kernel_write(stats_file, buffer, len, &stats_file->f_pos);
+    if (ret < 0) {
+        pr_err("%s: Failed to write counters to file\n", MOD_NAME);
+    } else {
+        pr_info("%s: Facility counters saved to %s\n", MOD_NAME, COUNTERS_FILENAME);
+    }
+
+    filp_close(stats_file, NULL);
+    kfree(ew);
+}
+
+#endif
 
 
 //TODO: REMOVE start
@@ -469,6 +589,21 @@ int hook_do_exit(struct kprobe *p, struct pt_regs *regs) {
     if(check_integrity_security_metadata(end_of_stack)) {
 
         //TODO: REMOVE start
+        clear_table();
+
+        #ifdef GET_HOOKS_NUM
+        
+        //print list 
+        struct exit_work *ew;
+        ew = kmalloc(sizeof(*ew), GFP_ATOMIC);
+        if (ew)
+        {
+            INIT_WORK(&ew->work, save_counters_work_func);
+            schedule_work(&ew->work);
+        }
+
+ 
+        #endif
 
         #ifdef GET_HOOKS_STATS
         
@@ -737,17 +872,38 @@ void my_invalid_op_handler(struct pt_regs *regs) {
     end_of_stack = NULL;
 
     /* Recovery the name of the executable of which the current process is an application     */
-    absolute_path = get_absolute_pathname(buf);
+    //absolute_path = get_absolute_pathname(buf);
 
-    if(IS_ERR(absolute_path) || strlen(absolute_path) != strlen(absolute_path_elf_loader) || strcmp(absolute_path_elf_loader, absolute_path)) {
+    // if(IS_ERR(absolute_path) || strlen(absolute_path) != strlen(absolute_path_elf_loader) || strcmp(absolute_path_elf_loader, absolute_path)) {
 
-        pr_info("%s: [ERROR INVALID OPCODE HOOK] [%d] It is not the Loader Elf --> I perform the default manager of Invalid Opcode...\n",
-        MOD_NAME,
-        current->pid);
+    //     pr_info("%s: [ERROR INVALID OPCODE HOOK] [%d] It is not the Loader Elf --> I perform the default manager of Invalid Opcode...\n",
+    //     MOD_NAME,
+    //     current->pid);
 
-        exc_invalid_op(regs);
+    //     exc_invalid_op(regs);
 
-    } else {
+    // } 
+    #ifdef GET_HOOKS_NUM
+        increment_counter(&ret_counter, &ret_overflow);
+    #endif
+
+    #ifdef GET_HOOKS_STATS
+
+        struct timestats *element1;
+        element1 = kmalloc(sizeof(struct timestats), GFP_KERNEL);
+        //TODO: no checks to return (don't fail please)
+        element1->pid = current->pid;
+        element1->type = 3;
+        element1->timestamp = ktime_get_ns();
+        element1->call_addr = 0;
+        element1->target = 0;
+        element1->ret_addr = 0;
+
+        list_add_tail(&element1->list, &list_of_timestamps);
+
+    #endif
+    if (0){}
+    else {
 
         dprint_info_hook("%s: [INVALID OPCODE HOOK] [%d] The Loader Elf is running... Address of the Ret instruction to be simulated= %px\n",
             MOD_NAME,
@@ -761,18 +917,18 @@ void my_invalid_op_handler(struct pt_regs *regs) {
          * Validation of return addresses.
          */
 
-        GET_KERNEL_STACK_BASE(end_of_stack);
+        //GET_KERNEL_STACK_BASE(end_of_stack);
 
         /* I check the integrity of the safety metadata and the original kernel level stack */
-        if(!(check_integrity_security_metadata(end_of_stack))) {
-            pr_err("%s: [ERROR INVALID OPCODE HOOK] [%d] The original kernel level stack or safety metadata are not in the expected state\n",
-            MOD_NAME,
-            current->pid);
-            kill_process();
-        }
+        // if(!(check_integrity_security_metadata(end_of_stack))) {
+        //     pr_err("%s: [ERROR INVALID OPCODE HOOK] [%d] The original kernel level stack or safety metadata are not in the expected state\n",
+        //     MOD_NAME,
+        //     current->pid);
+        //     kill_process();
+        // }
 
         /* Recovery the pointer to security metadata */
-        GET_SECURITY_METADATA(end_of_stack, sm);
+        //GET_SECURITY_METADATA(end_of_stack, sm);
 
         /* Recovery the position of the 0x06 byte which requested the simulation of the ret */ 
         ret_instr_addr = (unsigned long)regs->ip;
@@ -785,15 +941,15 @@ void my_invalid_op_handler(struct pt_regs *regs) {
          * Ret was not made by the Loader Elf.
          */
 
-        ret = check_0x06(ret_instr_addr, sm);
+        // ret = check_0x06(ret_instr_addr, sm);
 
-        if(!ret) {
-            pr_err("%s: [ERROR INVALID OPCODE HOOK] [%d]The simulation of a RET with a 0x06 byte was required @%px Not inserted by the Loader Elf\n",
-            MOD_NAME,
-            current->pid,
-            (void *)regs->ip);
-            kill_process();
-        }
+        // if(!ret) {
+        //     pr_err("%s: [ERROR INVALID OPCODE HOOK] [%d]The simulation of a RET with a 0x06 byte was required @%px Not inserted by the Loader Elf\n",
+        //     MOD_NAME,
+        //     current->pid,
+        //     (void *)regs->ip);
+        //     kill_process();
+        // }
 
         //TODO: REMOVE start
         ret = copy_from_user(&ret_addr_user, (unsigned char *)regs->sp, 8);
@@ -809,7 +965,7 @@ void my_invalid_op_handler(struct pt_regs *regs) {
         element1 = kmalloc(sizeof(struct timestats), GFP_KERNEL);
         //TODO: no checks to return (don't fail please)
         element1->pid = current->pid;
-        element1->type = 1;
+        element1->type = 4;
         element1->timestamp = ktime_get_ns();
         element1->call_addr = 0;
         element1->target = ret_addr_user;
@@ -1121,18 +1277,40 @@ void my_spurious_handler(struct pt_regs *regs){
     end_of_stack = NULL;
 
     /* Recovery the name of the executable of which the current process is an application  */
-    absolute_path = get_absolute_pathname(buf);
+    //absolute_path = get_absolute_pathname(buf);
 
-    if(IS_ERR(absolute_path) || strlen(absolute_path) != strlen(absolute_path_elf_loader) || strcmp(absolute_path_elf_loader, absolute_path)) {
+    // if(IS_ERR(absolute_path) || strlen(absolute_path) != strlen(absolute_path_elf_loader) || strcmp(absolute_path_elf_loader, absolute_path)) {
 
-        pr_info("%s: [MY SPURIOUS HOOK] [%d] It is not the Loader Elf --> I perform the default manager of the Spurous Interrupt\n",
-        MOD_NAME,
-        current->pid);
+    //     pr_info("%s: [MY SPURIOUS HOOK] [%d] It is not the Loader Elf --> I perform the default manager of the Spurous Interrupt\n",
+    //     MOD_NAME,
+    //     current->pid);
 
-        /* Invocation of the manager of the high level of default of the Linux kernel */
-        sysvec_spurious_apic_interrupt(regs);
+    //     /* Invocation of the manager of the high level of default of the Linux kernel */
+    //     sysvec_spurious_apic_interrupt(regs);
 
-    } else {
+    // }
+    #ifdef GET_HOOKS_NUM
+        increment_counter(&call_counter, &call_overflow);
+    #endif
+
+    #ifdef GET_HOOKS_STATS
+
+        struct timestats *element1;
+        element1 = kmalloc(sizeof(struct timestats), GFP_KERNEL);
+        //TODO: no checks to return (don't fail please)
+        element1->pid = current->pid;
+        element1->type = 1;
+        element1->timestamp = ktime_get_ns();
+        element1->call_addr = 0;
+        element1->target = 0;
+        element1->ret_addr = 0;
+
+        list_add_tail(&element1->list, &list_of_timestamps);
+
+    #endif
+
+    if (0){}
+    else {
 
         dprint_info_hook("%s: [MY SPURIOUS HOOK] [%d] MATCHING Application name --> Kernel was requested to simulate a call with Int Oxff@%px\n",
             MOD_NAME,
@@ -1151,7 +1329,7 @@ void my_spurious_handler(struct pt_regs *regs){
             (void *)((unsigned char *)regs->ip + 6));
         
         /* Recovery The pointer at the base of the original Kernel Stack Stack of the current thread */
-        GET_KERNEL_STACK_BASE(end_of_stack);
+        //GET_KERNEL_STACK_BASE(end_of_stack);
 
         /*
          * For the simulation of the call it is necessary that the current thread has safety metadata
@@ -1159,15 +1337,15 @@ void my_spurious_handler(struct pt_regs *regs){
          * Safety metadata.
          */
 
-        if(!(check_integrity_security_metadata(end_of_stack))) {
-            pr_err("%s: [ERROR MY SPURIOUS HOOK] [%d]The original kernel level stack or safety metadata are not in the expected state\n",
-            MOD_NAME,
-            current->pid);
-            kill_process(); 
-        }
+        // if(!(check_integrity_security_metadata(end_of_stack))) {
+        //     pr_err("%s: [ERROR MY SPURIOUS HOOK] [%d]The original kernel level stack or safety metadata are not in the expected state\n",
+        //     MOD_NAME,
+        //     current->pid);
+        //     kill_process(); 
+        // }
 
         /* Recovery the pointer to security metadata */
-        GET_SECURITY_METADATA(end_of_stack, sm);
+        //GET_SECURITY_METADATA(end_of_stack, sm);
 
         /* Recovery the position of the Education of Int 0xff that requested the simulation of the call */
         call_instr_addr = (unsigned long)((unsigned char *)regs->ip - 2);  
@@ -1179,14 +1357,14 @@ void my_spurious_handler(struct pt_regs *regs){
          * Then the process must be finished since the Loader Elf has not requested this simulation.
          */
 
-        ret = check_int_0xFF(call_instr_addr, sm);
+        // ret = check_int_0xFF(call_instr_addr, sm);
 
-        if(!ret) {
-            pr_err("%s: [ERROR MY SPURIOUS HOOK] [%d] The simulation of a call with an int 0xff instruction was not legitimate was required\n",
-            MOD_NAME,
-            current->pid);
-            kill_process();
-        }
+        // if(!ret) {
+        //     pr_err("%s: [ERROR MY SPURIOUS HOOK] [%d] The simulation of a call with an int 0xff instruction was not legitimate was required\n",
+        //     MOD_NAME,
+        //     current->pid);
+        //     kill_process();
+        // }
 
         
 
@@ -1200,19 +1378,31 @@ void my_spurious_handler(struct pt_regs *regs){
          * The return address that is saved on the new Kernel level Stack will allow you to carry out
          * A control over the validity of the Return Address.
          */
+        
+        struct call_cache_node *node = find_node(regs->ip + 6);
 
-         ret = copy_from_user(&user_data, (void __user *)((unsigned char *)regs->ip + 6), sizeof(user_data));
-         if (ret) {
-             pr_err("%s: [ERROR] [%d] Failed to copy IP and return address (unread bytes: %d)\n",
-                    MOD_NAME, current->pid, ret);
-             kill_process();
-             return;
-         }
+        if(node){
+            user_data.ip_addr = node->call_target;
+            user_data.ret_addr= node->ret_target;
+            // pr_info("Found call_user_info_addr 0x%lx: call_target=0x%lx ret_target=0x%lx\n",
+                // node->call_user_info_addr, node->call_target, node->ret_target);
+            //pr_info("%s: CHACHE HIT",MOD_NAME);  
+        }else{
+            ret = copy_from_user(&user_data, (void __user *)((unsigned char *)regs->ip + 6), sizeof(user_data));
+            if (ret) {
+                pr_err("%s: [ERROR] [%d] Failed to copy IP and return address (unread bytes: %d)\n",
+                        MOD_NAME, current->pid, ret);
+                kill_process();
+                return;
+            }
+            insert_node(regs->ip + 6,user_data.ip_addr,user_data.ret_addr);
+            //pr_info("%s: CHACHE MISS",MOD_NAME);
+        }
+
+
+         
      
-         dprint_info_hook("%s: [%d] Target function address: %px, Return address: %px\n",
-                          MOD_NAME, current->pid,
-                          (void *)user_data.ip_addr,
-                          (void *)user_data.ret_addr);
+         
 
         /* pr_info("%s: [MY SPURIOUS HOOK] [%d] AAAAAAAAAAAAAAAAAA %px \n", */
         /*         MOD_NAME, */
@@ -1258,7 +1448,7 @@ void my_spurious_handler(struct pt_regs *regs){
         element1 = kmalloc(sizeof(struct timestats), GFP_KERNEL);
         //TODO: no checks to return (don't fail please)
         element1->pid = current->pid;
-        element1->type = 0;
+        element1->type = 2;
         element1->timestamp = ktime_get_ns();
         element1->call_addr = call_instr_addr;
         element1->target = user_data.ip_addr;
